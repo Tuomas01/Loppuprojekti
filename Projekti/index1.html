@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!--Add leaflet library from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+  <script
+    src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
+  <script src="./vendor/code.min.js"></script>
+  <!--Leaflet END-->
+
+  <!--Cluster markers on map -->
+  <link rel="stylesheet" href="./vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="./vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css">
+  <script src="./vendor/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
+  <!--Cluster END -->
+  <link rel="stylesheet" href="./css/styles.css">
+
+  <title>Kartta</title>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <h1>HEADER</h1>
+    </nav>
+  </header>
+  <main>
+    <aside id="aside">
+      <section id='fields'>
+        <input id='search' type='text' placeholder="Osoite">
+        <button id='clearMarkersBtn' onclick="clearMarkers()">Clear</button>
+        <button id='showDataBtn' onclick="showData()">Search</button>
+        <!-- <button id='findBtn' onclick="findMe()">Find me</button> -->
+      </section>
+      <section id='filter'>
+        <div class="option">
+          <label>Sähköauton latauspiste</label>
+          <input id='sahkoAuto' type='checkbox'>
+        </div>
+        <div class="option">
+          <label>Ilmainen</label>
+          <input id='ilmainen' type='checkbox'>
+        </div>
+      </section>
+    </aside>
+    <section id='map'></section>
+  </main>
+  <script src="./js/getCoords.js"></script>
+  <script src="./js/getData.js"></script>
+  <script src="./js/map.js"></script>
+  <script src="./js/main.js"></script>
+
+</body>
+
+</html>
