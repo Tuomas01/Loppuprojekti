@@ -1,74 +1,87 @@
-// Clear map from markers
-function clearMarkers() {
-  map.eachLayer((layer) => {
-    if (layer instanceof L.MarkerClusterGroup) {
-      map.removeLayer(layer);
-    }
-  });
-}
+async function main() {
+  // Sivuston latauduttua
+  // lataa APIn palauttamat tiedot
+  // 'parkingData' arvoksi
+  const parkingData = await getData();
 
-// Filter data with user choices
-async function filteredData() {
-  const sahko = document.getElementById('sahkoAuto').checked;
-  const ilmainen = document.getElementById('ilmainen').checked;
-  const hsl = document.getElementById('hslAlue').checked;
-  const data = await getData();
+  // ParkkiAPIn data näkyy konsolissa
+  // Features pitää sisällään kaikki parkkipaikat
+  // Klikkaamalla auki 'features' näkyy kaikki liityntäpysäköintipaikat
+  console.log(parkingData);
 
-  switch (true) {
-    case (sahko && ilmainen && hsl):
-      return data.features.filter((place) => place.attributes.HINTAFI === 'ilmainen'
-      && place.attributes.SAHKOAUTO > 0
-      && place.attributes.HSL_ALUE > 0);
-    case (sahko && ilmainen):
-      return data.features.filter((place) => place.attributes.SAHKOAUTO > 0
-      && place.attributes.HINTAFI === 'ilmainen');
-    case (sahko && hsl):
-      return data.features.filter((place) => place.attributes.SAHKOAUTO > 0
-      && place.attributes.HSL_ALUE > 0);
-    case (ilmainen && hsl):
-      return data.features.filter((place) => place.attributes.HINTAFI === 'ilmainen'
-      && place.attributes.HSL_ALUE > 0);
-    case (sahko):
-      console.log(data.features.filter((place) => place.attributes.SAHKOAUTO > 0));
-      return data.features.filter((place) => place.attributes.SAHKOAUTO > 0);
-    case (ilmainen):
-      return data.features.filter((place) => place.attributes.HINTAFI === 'ilmainen');
-    case (hsl):
-      return data.features.filter((place) => place.attributes.HSL_ALUE > 0);
-    default:
-      return data.features;
+  // Features on array joka pitää sisällään olioita
+  // Olion arvoina ovat parkkipaikan tiedot
+  //
+  // esim.
+  // parkingData.features[0].attributes.NAVIGOINTI (huom. isot ja pienet kirjaimet)
+  // Antaa arvoksi features arrayn ENSIMMÄISENÄ olevan parkkipaikan osoitteen
+  // Konsolissa pitäisi näkyä => Poikkitie 91
+  console.log(parkingData.features[0].attributes.NAVIGOINTI);
+
+  // Lisää parkkipaikat kartalle
+  async function showData(arr) {
+    // Tallenna filtteröity data muuttujaan
+    // filteredData() palauttaa arrayn
+    const filtered = await filteredData(arr);
+    // Create group for clustering markers
+    const markers = new L.MarkerClusterGroup();
+
+    // Käy läpi filtteröity array
+    // Lisää jokaisen parkkipaikan tiedot popuppiin ja lopuksi parkkipaikat kartalle
+    filtered.forEach((place) => {
+      // Popup kun käyttäjä klikkaa parkkipaikka ikonia
+      const popup = `
+        <h4>${place.attributes.KUNTA || 'Kuntatieto ei saatavilla'}</h4>
+        <p>Katuosoite: ${place.attributes.OSOITEFI || 'Katuosoite ei saatavilla'} </p>
+        <p>Paikkoja: ${place.attributes.PAIKKOJA || 'Paikkatietoja ei saatavilla'}</p>
+        <p>Parkkimaksu: ${place.attributes.HINTAFI || 'Parkkimaksutietoja ei saatavilla'}</p>
+        <p>Latauspisteitä sähköautoille: ${place.attributes.SAHKOAUTO}</p>`;
+
+      // Sijaintitiedot ovat polygoneja (maalattu alue kartalla)
+      // getCoordinates() palauttaa polygonin keskuskohdan sijainnin latitude ja longitude arvoina
+      // Latitude ja longitude arvojen avulla, parkkipaikka lisätään markkerina kartalle
+      //
+      // Parkkipaikan iconiksi on määritelty 'parking.svg'
+      // Tiedot ikonista löytyvät tiedostosta icons.js
+      markers.addLayer(L
+        .marker(getCoordinates(place.geometry.rings[0]), { icon: parking })
+        .bindPopup(popup)).on('click', clickZoom);
+
+      // 1. Tyhjennä kartta aiemmsita markkereista
+      // 2. Lisää markkerit
+      // Näin tehdään ettei vanhat markkerit jää kartalle kun filtteröinti tapahtuu
+      clearMarkers();
+      map.addLayer(markers);
+    });
   }
+
+  // Hae kaikki elementit (checkboxit) joiden luokka on 'filtered'
+  // Jos checkboxin arvo vaihtuu näytä filtteröity data kartalla
+  function addListeners() {
+    const elements = document.getElementsByClassName('filtered');
+    Array.from(elements, (c) => c.addEventListener('change', () => showData(parkingData)));
+  }
+
+  // Tyhjennä markkerit (parkkipaikat) kartalta
+  function clearMarkers() {
+    map.eachLayer((layer) => {
+      if (layer instanceof L.MarkerClusterGroup) {
+        map.removeLayer(layer);
+      }
+    });
+  }
+
+  function clickZoom(e) {
+    map.on('popupopen', (e) => {
+      const px = map.project(e.target._popup._latlng);
+      px.y -= e.target._popup._container.clientHeight / 2;
+      map.panTo(map.unproject(px), { animate: true });
+    });
+  }
+  // Lisää eventhandlerit DOMiin
+  addListeners();
+  // Lisää kaikki parkkipaikat kartalle (ensimmäinen lataus)
+  showData(parkingData);
 }
 
-// Add data to map
-async function showData() {
-  const places = await filteredData();
-  console.log(places);
-
-  // Create group for clustering markers
-  const markers = new L.MarkerClusterGroup();
-
-  // Array includes geometry and info from all places
-  // Iterate through array
-  places.forEach((place) => {
-    // Popup with descriptions when user clicks icon
-    const popup = `
-      <h4>${place.attributes.KUNTA || 'Kuntatieto ei saatavilla'}</h4>
-      <p>Katuosoite: ${place.attributes.OSOITEFI || 'Katuosoite ei saatavilla'} </p>
-      <p>Paikkoja: ${place.attributes.PAIKKOJA || 'Paikkatietoja ei saatavilla'}</p>
-      <p>Parkkimaksu: ${place.attributes.HINTAFI || 'Parkkimaksutietoja ei saatavilla'}</p>
-      <p>Latauspisteitä sähköautoille: ${place.attributes.SAHKOAUTO || 'Tietoja ei saatavilla'}</p>`;
-
-    // Add markers to layer
-    // Bind popup box to markers
-    markers.addLayer(L
-      .marker(getCoordinates(place.geometry.rings[0]))
-      .bindPopup(popup));
-
-    // Clear markers before adding new ones
-    clearMarkers();
-    map.addLayer(markers);
-  });
-}
-
-showData();
+main();

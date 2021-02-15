@@ -1,5 +1,4 @@
-// Api returns location data as polygons
-// Return center of polygons as longitude (Y) and latitude (X)
+// Palauta polygonin keskus longitude (Y) ja latitude (X) arvoina
 function getCoordinates(arr) {
   let minX;
   let maxX;

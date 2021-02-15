@@ -2,32 +2,34 @@ const textFrom = document.getElementById('from');
 const textTo = document.getElementById('to');
 let timeout = null; // default set
 
+// API antaa jostain syystä samoja osoitteita
+// Poista kopiot
 function removeDuplicates(array) {
   const result = array.map((a) => a.properties.label);
   return [...new Set(result)];
 }
 
-// Get auto complete street names
-// Field: from
+// Hae 'FROM' kentästä arvo jolla hakea osoitteita
 function getOptionsFrom(text) {
-  // Make array from options
-  // Hide autofill field if input has same address
+  // Tee array osoitteista
+  // Näytä ne datalist kentässä
   const array1 = Array.from(document.getElementsByClassName('autoFillFrom'));
   if (array1[0]) {
     const arr = array1.filter((option) => option.value === document.getElementById('from').value);
     if (arr.length > 0) return;
   }
 
+  // Timeout = odota 0.5 sekuntia ennen haun tekemistä
+  // Tämä siksi ettei jokaisen kirjoitetun kirjaimen jälkeen tehtäisi samantien hakua
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
     const response = await fetch(`https://api.digitransit.fi/geocoding/v1/autocomplete?text=${text}`);
-    // &layers=address
     const data = await response.json();
     const suggested = data.features;
     const list = document.getElementById('optionsFrom');
     list.innerHTML = '';
 
-    // Remove duplicate addresses
+    // Poista kopiot
     const options = removeDuplicates(suggested);
 
     options.forEach((address) => {
@@ -39,11 +41,10 @@ function getOptionsFrom(text) {
   }, 500);
 }
 
-// Get auto complete street names
-// Field: to
+// Hae 'TO' kentästä arvo jolla hakea osoitteita
 function getOptionsTo(text) {
-  // Make array from options
-  // Hide autofill field if input has same address
+  // Tee array osoitteista
+  // Näytä ne datalist kentässä
   const array1 = Array.from(document.getElementsByClassName('autoFillTo'));
   if (array1[0]) {
     const arr = array1.filter((option) => option.value === document.getElementById('to').value);
@@ -58,7 +59,6 @@ function getOptionsTo(text) {
     const list = document.getElementById('optionsTo');
     list.innerHTML = '';
 
-    // Remove duplicate addresses
     const options = removeDuplicates(suggested);
 
     options.forEach((address) => {
@@ -70,6 +70,7 @@ function getOptionsTo(text) {
   }, 500);
 }
 
+// Poista ylimääräiset välilyönnit ja hae osoitteet
 textFrom.addEventListener('input', (e) => {
   if (!e.target.value.trim()) return;
   getOptionsFrom(e.target.value);

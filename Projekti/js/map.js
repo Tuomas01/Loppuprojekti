@@ -1,5 +1,9 @@
-// Starting point for map([latitude, longitude], zoom level)
-const map = L.map('map').setView([60.3733244, 24.8410248], 9);
+// Zoomsnap = kuinka paljon kartta zoomaa kerrallaan
+// Kartan aloituspiste
+// Zoom level aluksi
+const map = L.map('map', {
+  zoomSnap: 1.5,
+}).setView([60.3733244, 24.8410248], 9);
 
 // GPS button
 function findMe() {
@@ -19,7 +23,7 @@ function findMe() {
   map.on('locationerror', onLocationError);
 }
 
-// Add graph to map (HSL-tiles)
+// Reittioppaan karttagrafiikka
 const Normal = L.tileLayer('https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.png', {
   maxZoom: 19,
   tileSize: 512,
@@ -27,7 +31,7 @@ const Normal = L.tileLayer('https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}.p
   id: 'hsl-map',
 }).addTo(map);
 
-// HD map tiles
+// Reittioppaan karttagrafiikka (HD)
 const HD = L.tileLayer('https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}@2x.png', {
   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '
     + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
@@ -37,11 +41,12 @@ const HD = L.tileLayer('https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}@2x.pn
   id: 'hsl-map',
 });
 
-// Add scale indicator to map (km)
+// Näytä km mitta
 L.control.scale({
   imperial: false,
 }).addTo(map);
 
+// Näytä valikko kartan oikeassa ylänurkassa
 L.control.layers({
   Normal,
   HD,

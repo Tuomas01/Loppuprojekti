@@ -1,30 +1,34 @@
-async function getAddress(address) {
-  const response = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${address}&size=1`);
-  const data = await response.json();
+// Hae lat ja long arvot HSL apista
+async function getRoutePoints(start, end) {
+  const queryFrom = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${start}&size=1`);
+  const queryTo = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${end}&size=1`);
+
+  const from = await queryFrom.json();
+  const to = await queryTo.json();
+
   const coordinates = {
-    lat: data.features[0].geometry.coordinates[1],
-    lon: data.features[0].geometry.coordinates[0],
+    from: {
+      lat: from.features[0].geometry.coordinates[1],
+      lon: from.features[0].geometry.coordinates[0],
+    },
+    to: {
+      lat: to.features[0].geometry.coordinates[1],
+      lon: to.features[0].geometry.coordinates[0],
+    },
+
   };
   return coordinates;
 }
 
-function getLocations() {
-  const from = document.getElementById('from').value;
-  const to = document.getElementById('to').value;
-  return { from, to };
-}
-
-// Get route
+// Hae reitti käyttäen alku- ja loppuosoitteita
 async function getRoute(start, end) {
   const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
   // GraphQL haku
-  const from = await getAddress(start);
-  const to = await getAddress(end);
-
+  const route = await getRoutePoints(start, end);
   const query = `{
     plan(
-      from: {lat: ${from.lat}, lon: ${from.lon}}
-      to: {lat: ${to.lat}, lon: ${to.lon}}
+      from: {lat: ${route.from.lat}, lon: ${route.from.lon}}
+      to: {lat: ${route.to.lat}, lon: ${route.to.lon}}
     ) {
       itineraries {
         legs {
@@ -46,13 +50,25 @@ async function getRoute(start, end) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ query }), // GraphQL haku lisätään queryyn
+    body: JSON.stringify({ query }), // Add query params to fetch call
   };
 
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
 
-  // Draw route using the result coordinates
+  // TODO:
+  // Oma layeri reitti polygonille
+
+  // Poista vanha reitti ennen uuden reitin lisäämistä kartalle
+  map.eachLayer((layer) => {
+    if (layer._path != null) {
+      layer.remove();
+    }
+  });
+
+  // Määrittele värit reitillä
+  // Esim. kävelypätkä = vihreä
+  // Nämä ovat vain placeholdereita
   result.data.plan.itineraries[0].legs.forEach((point) => {
     let color = '';
     switch (point.mode) {
@@ -72,11 +88,12 @@ async function getRoute(start, end) {
         color = 'blue';
         break;
     }
-    const route = (point.legGeometry.points);
+    const route = point.legGeometry.points;
     const points = L.Polyline
       .fromEncoded(route)
       .getLatLngs();
 
+    // Lisää tyylit reitille ja piirrä se kartalle
     L.polyline(points)
       .setStyle({
         color,
@@ -85,9 +102,10 @@ async function getRoute(start, end) {
   });
 }
 
-// Get lat and long coords
-// Get the route using lat and long
+// Hae kenttien arvot
+// Piirrä reitti kartalle
 function showRoute() {
-  const trip = getLocations();
-  getRoute(trip.from, trip.to);
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
+  getRoute(from, to);
 }

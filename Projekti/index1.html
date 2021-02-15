@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="./vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css">
   <script src="./vendor/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
   <!--Cluster END -->
+  <link rel="shortcut icon" href="favicon.ico">
   <link rel="stylesheet" href="./css/styles.css">
 
   <title>Kartta</title>
@@ -37,38 +38,47 @@
   <main>
     <aside id="aside">
       <section id='fields'>
-        <input type='text' id='from' placeholder="FROM" list='optionsFrom' autocomplete="off">
-        <datalist id="optionsFrom">
-        </datalist>
-        <input type='text' id='to' placeholder="TO" list='optionsTo' autocomplete="off">
-        <datalist id="optionsTo">
-        </datalist>
-        <button id='hsl' onclick="showRoute()">Show route</button>
+        <form onsubmit="showRoute(); return false">
+          <input type='text' id='from' placeholder="FROM" list='optionsFrom' autocomplete="off" required>
+          <datalist id="optionsFrom">
+          </datalist>
+          <input type='text' id='to' placeholder="TO" list='optionsTo' autocomplete="off" required>
+          <datalist id="optionsTo">
+          </datalist>
+          <button type="submit" id='hsl'>Show route</button>
+        </form>
         <!-- <button id='findBtn' onclick="findMe()">Find me</button> -->
       </section>
       <section id='filter'>
         <div class="option">
           <label>Sähköauton latauspiste</label>
-          <input oninput="showData()" id='sahkoAuto' type='checkbox'>
+          <input id='sahkoAuto' type='checkbox' class="filtered">
         </div>
         <div class="option">
           <label>Ilmainen</label>
-          <input oninput="showData()" id='ilmainen' type='checkbox'>
+          <input id='ilmainen' type='checkbox' class="filtered">
         </div>
         <div class="option">
           <label>HSL-alue</label>
-          <input oninput="showData()" id='hslAlue' type='checkbox' checked>
+          <input id='hslAlue' type='checkbox' class="filtered" checked>
         </div>
+        <!-- <div class="option">
+          <label>Näytä vyöhykkeet</label>
+          <input oninput="drawRegions()" id='hslAlue' type='checkbox'>
+        </div> -->
       </section>
     </aside>
     <section id='map'></section>
   </main>
+  <script src="./js/icons.js"></script>
+  <script src="./js/filterData.js"></script>
   <script src="./js/autofillAddress.js"></script>
   <script src="./js/getData.js"></script>
   <script src="./js/getCoords.js"></script>
+  <script src="./js/regionData.js"></script>
   <script src="./js/map.js"></script>
-  <script src="./js/main.js"></script>
   <script src="./js/HSL.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 
 </html>
