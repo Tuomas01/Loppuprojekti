@@ -24,11 +24,16 @@ async function getRoutePoints(start, end) {
 async function getRoute(start, end) {
   const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
   // GraphQL haku
+  const today = new Date();
+  const pvm = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+  const aika = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
   const route = await getRoutePoints(start, end);
   const query = `{
     plan(
       from: {lat: ${route.from.lat}, lon: ${route.from.lon}}
       to: {lat: ${route.to.lat}, lon: ${route.to.lon}}
+      date: "${pvm}" ,
+      time: "${aika}" ,
     ) {
       itineraries {
         legs {
@@ -45,6 +50,7 @@ async function getRoute(start, end) {
     }
   }`;
 
+
   const fetchOptions = {
     method: 'POST',
     headers: {
@@ -52,9 +58,22 @@ async function getRoute(start, end) {
     },
     body: JSON.stringify({ query }), // Add query params to fetch call
   };
-
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
+  let kavely = document.getElementById('kavelymatka');
+  console.log('moro');
+  console.log(result);
+  for (let i = 0; i < result.data.plan.itineraries.length; i++) {
+    console.log(result.data.plan.itineraries[0].legs[i].startTime);
+    let unix = result.data.plan.itineraries[0].legs[i].startTime;
+    let aika = new Date(unix * 1000);
+    let tunnit = aika.getHours();
+    let minuutit = "0" + aika.getMinutes();
+    let sekuntit = "0" + aika.getSeconds();
+    let lahtemisaika = tunnit + ':' + minuutit.substr(-2) + ':' + sekuntit.substr(-2);
+    const uusi = lahtemisaika + '<p></p>';
+    kavely.innerHTML += uusi;
+  }
 
   // TODO:
   // Oma layeri reitti polygonille
