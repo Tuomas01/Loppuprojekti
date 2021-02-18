@@ -25,8 +25,8 @@ async function getRoute(start, end) {
   const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
   // GraphQL haku
   const today = new Date();
-  const pvm = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-  const aika = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+  const pvm = today.getFullYear()+'.'+(today.getMonth()+1)+'.'+today.getDate();
+  const aika = today.getHours() + '.' + today.getMinutes() + '.' + today.getSeconds();
   const route = await getRoutePoints(start, end);
   const query = `{
     plan(
@@ -60,19 +60,46 @@ async function getRoute(start, end) {
   };
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
-  let kavely = document.getElementById('kavelymatka');
-  console.log('moro');
+  let lahto = document.getElementById('startTime');
+  const ajatpvm = document.getElementById('pvm');
   console.log(result);
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
-    console.log(result.data.plan.itineraries[0].legs[i].startTime);
-    let unix = result.data.plan.itineraries[0].legs[i].startTime;
-    let aika = new Date(unix * 1000);
-    let tunnit = aika.getHours();
-    let minuutit = "0" + aika.getMinutes();
-    let sekuntit = "0" + aika.getSeconds();
-    let lahtemisaika = tunnit + ':' + minuutit.substr(-2) + ':' + sekuntit.substr(-2);
-    const uusi = lahtemisaika + '<p></p>';
-    kavely.innerHTML += uusi;
+    for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
+      // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
+      let unixstart = result.data.plan.itineraries[i].legs[j].startTime;
+      let unixend = result.data.plan.itineraries[i].legs[j].endTime;
+      // luodaan muuttuja mode, johon annetaan arvoksi tapa, jolla matkustetaan
+      let mode = result.data.plan.itineraries[i].legs[j].mode;
+      let distance = result.data.plan.itineraries[i].legs[j].distance;
+      if (mode === "WALK") {
+        mode = ` Kävele ${distance}`;
+      } else if (mode === "RAIL") {
+        mode = ` Matkusta junalla ${distance}`;
+      } else if (mode === "BUS") {
+        mode = ` Matkusta bussilla ${distance}`;
+      }
+      // Luo Date objekti ja anna sen arvoksi unix, jotta unix arvo muutetaan date muotoon, eli tallenna unix arvot muuttujiin
+      let lahtoaika = new Date(unixstart);
+      let loppuaika = new Date(unixend);
+      // Hae tunnit unix ajoista
+      let lahtotunnit = lahtoaika.getHours();
+      let lopputunnit = loppuaika.getHours();
+      /* hae minuutit, lisää 0, jotta minuutit alle 10 näkyvät oikein esim.
+         11.07.02 eikä 11.7.2 ja muunna minuutit numerosta merkkijonoksi nollan avulla */
+      let lahtominuutit = "0" + lahtoaika.getMinutes();
+      let loppuminuutit = "0" + loppuaika.getMinutes();
+      // console.log(typeof minuutit);
+      // lisätään päivämäärä ja lähtemisaika muuttujaan
+      const paivamaara = today.getDate() + '.' + (today.getMonth() + 1);
+      // miinustetaan minuuteista ensimmäiset 2 numeroa, jotta minuutit näkyvät oikeassa muodossa
+      let lahtemisaika = lahtotunnit + '.' + lahtominuutit.substr(-2);
+      let pysahdysaika = lopputunnit + '.' + loppuminuutit.substr(-2);
+      const uusi = 'Klo: ' + lahtemisaika + ' - ' +
+          pysahdysaika + mode + '<p></p>';
+      // lisätään muuttuja uusi, joka sisältää lähtemisajat ja päivämäärä sivulle
+      lahto.innerHTML += uusi;
+      ajatpvm.innerHTML = paivamaara;
+    }
   }
 
   // TODO:
