@@ -1,3 +1,4 @@
+'use strict';
 // Hae lat ja long arvot HSL apista
 async function getRoutePoints(start, end) {
   const queryFrom = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${start}&size=1`);
@@ -62,8 +63,12 @@ async function getRoute(start, end) {
   const result = await response.json();
   let lahto = document.getElementById('startTime');
   const ajatpvm = document.getElementById('pvm');
+  const loppuaikataulukko0 = [];
   console.log(result);
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
+    // lisää päivämäärä enne jokaista matkaa erottaakseen matkat toisistaan
+    const paivamaara = today.getDate() + '.' + (today.getMonth() + 1);
+    lahto.innerHTML += `${paivamaara} <p></p>`;
     for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
       // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
       let unixstart = result.data.plan.itineraries[i].legs[j].startTime;
@@ -79,28 +84,31 @@ async function getRoute(start, end) {
         mode = ` Matkusta bussilla ${distance}`;
       }
       // Luo Date objekti ja anna sen arvoksi unix, jotta unix arvo muutetaan date muotoon, eli tallenna unix arvot muuttujiin
-      let lahtoaika = new Date(unixstart);
-      let loppuaika = new Date(unixend);
+      const lahtoaika = new Date(unixstart);
+      const loppuaika = new Date(unixend);
       // Hae tunnit unix ajoista
-      let lahtotunnit = lahtoaika.getHours();
-      let lopputunnit = loppuaika.getHours();
+      const lahtotunnit = lahtoaika.getHours();
+      const lopputunnit = loppuaika.getHours();
+      const viimeinen = [result.data.plan.itineraries[i].legs.length -1];
       /* hae minuutit, lisää 0, jotta minuutit alle 10 näkyvät oikein esim.
          11.07.02 eikä 11.7.2 ja muunna minuutit numerosta merkkijonoksi nollan avulla */
-      let lahtominuutit = "0" + lahtoaika.getMinutes();
-      let loppuminuutit = "0" + loppuaika.getMinutes();
+      const lahtominuutit = "0" + lahtoaika.getMinutes();
+      const loppuminuutit = "0" + loppuaika.getMinutes();
       // console.log(typeof minuutit);
       // lisätään päivämäärä ja lähtemisaika muuttujaan
-      const paivamaara = today.getDate() + '.' + (today.getMonth() + 1);
       // miinustetaan minuuteista ensimmäiset 2 numeroa, jotta minuutit näkyvät oikeassa muodossa
-      let lahtemisaika = lahtotunnit + '.' + lahtominuutit.substr(-2);
-      let pysahdysaika = lopputunnit + '.' + loppuminuutit.substr(-2);
+      const lahtemisaika = lahtotunnit + '.' + lahtominuutit.substr(-2);
+      const pysahdysaika = lopputunnit + '.' + loppuminuutit.substr(-2);
+      if (i === 0) {
+        loppuaikataulukko0.push(pysahdysaika);
+      }
       const uusi = 'Klo: ' + lahtemisaika + ' - ' +
           pysahdysaika + mode + '<p></p>';
       // lisätään muuttuja uusi, joka sisältää lähtemisajat ja päivämäärä sivulle
       lahto.innerHTML += uusi;
-      ajatpvm.innerHTML = paivamaara;
     }
   }
+  console.log(loppuaikataulukko0[loppuaikataulukko0.length -1]);
 
   // TODO:
   // Oma layeri reitti polygonille
