@@ -56,13 +56,18 @@ async function getRoute(start, end) {
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
 
+  console.log(result);
+
   // TODO:
   // Oma layeri reitti polygonille
 
   // Poista vanha reitti ennen uuden reitin lisäämistä kartalle
+  // Tämä on vasta ns. "purkkaratkaisu", mutta toimii
   map.eachLayer((layer) => {
     if (layer._path != null) {
-      layer.remove();
+      if (!layer._latlngs[0].length) { layer.remove(); } else {
+        console.log(layer);
+      }
     }
   });
 
@@ -93,6 +98,7 @@ async function getRoute(start, end) {
       .fromEncoded(route)
       .getLatLngs();
 
+    if (points instanceof L.Polyline) console.log('hepp');
     // Lisää tyylit reitille ja piirrä se kartalle
     L.polyline(points)
       .setStyle({
