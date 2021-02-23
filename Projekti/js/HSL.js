@@ -65,9 +65,7 @@ async function getRoute(start, end) {
   // Tämä on vasta ns. "purkkaratkaisu", mutta toimii
   map.eachLayer((layer) => {
     if (layer._path != null) {
-      if (!layer._latlngs[0].length) { layer.remove(); } else {
-        console.log(layer);
-      }
+      if (!layer._latlngs[0].length) layer.remove();
     }
   });
 
@@ -76,18 +74,23 @@ async function getRoute(start, end) {
   // Nämä ovat vain placeholdereita
   result.data.plan.itineraries[0].legs.forEach((point) => {
     let color = '';
+    let dashArray = '';
     switch (point.mode) {
       case 'WALK':
-        color = 'green';
+        color = 'black';
+        dashArray = '10,20';
         break;
       case 'BUS':
-        color = 'red';
+        color = '#007ac9';
         break;
       case 'RAIL':
-        color = 'cyan';
+        color = '#8c4799';
         break;
       case 'TRAM':
         color = 'magenta';
+        break;
+      case 'SUBWAY':
+        color = '#ff6319';
         break;
       default:
         color = 'blue';
@@ -103,6 +106,7 @@ async function getRoute(start, end) {
     L.polyline(points)
       .setStyle({
         color,
+        dashArray,
       })
       .addTo(map);
   });
