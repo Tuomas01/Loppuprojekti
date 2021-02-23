@@ -75,14 +75,7 @@ async function getRoute(start, end) {
       let unixend = result.data.plan.itineraries[i].legs[j].endTime;
       // luodaan muuttuja mode, johon annetaan arvoksi tapa, jolla matkustetaan
       let mode = result.data.plan.itineraries[i].legs[j].mode;
-      let distance = result.data.plan.itineraries[i].legs[j].distance;
-      if (mode === "WALK") {
-        mode = ` Kävele ${distance}`;
-      } else if (mode === "RAIL") {
-        mode = ` Matkusta junalla ${distance}`;
-      } else if (mode === "BUS") {
-        mode = ` Matkusta bussilla ${distance}`;
-      }
+      let distance = Math.round(result.data.plan.itineraries[i].legs[j].distance);
       // Luo Date objekti ja anna sen arvoksi unix, jotta unix arvo muutetaan date muotoon, eli tallenna unix arvot muuttujiin
       const lahtoaika = new Date(unixstart);
       const loppuaika = new Date(unixend);
@@ -97,10 +90,18 @@ async function getRoute(start, end) {
       // console.log(typeof minuutit);
       // lisätään päivämäärä ja lähtemisaika muuttujaan
       // miinustetaan minuuteista ensimmäiset 2 numeroa, jotta minuutit näkyvät oikeassa muodossa
+      const aikaamatkaan = (lopputunnit + loppuminuutit.substr(-2)) - (lahtotunnit + lahtominuutit.substr(-2));
       const lahtemisaika = lahtotunnit + '.' + lahtominuutit.substr(-2);
       const pysahdysaika = lopputunnit + '.' + loppuminuutit.substr(-2);
       if (i === 0) {
         loppuaikataulukko0.push(pysahdysaika);
+      }
+      if (mode === "WALK") {
+        mode = ` Kävele ${distance} m (${aikaamatkaan} min)`;
+      } else if (mode === "RAIL") {
+        mode = ` Matkusta junalla ${distance} m (${aikaamatkaan} min)`;
+      } else if (mode === "BUS") {
+        mode = ` Matkusta bussilla ${distance} m (${aikaamatkaan} min)`;
       }
       const uusi = 'Klo: ' + lahtemisaika + ' - ' +
           pysahdysaika + mode + '<p></p>';
