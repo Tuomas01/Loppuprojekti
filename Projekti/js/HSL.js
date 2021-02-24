@@ -61,14 +61,14 @@ async function getRoute(start, end) {
   };
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
-  let lahto = document.getElementById('startTime');
+  const lahto = document.getElementById('startTime');
   const ajatpvm = document.getElementById('pvm');
-  const loppuaikataulukko0 = [];
+  const clickable = document.getElementById('ajat');
   console.log(result);
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
     // lisää päivämäärä enne jokaista matkaa erottaakseen matkat toisistaan
     const paivamaara = today.getDate() + '.' + (today.getMonth() + 1);
-    lahto.innerHTML += `${paivamaara} <p></p>`;
+    lahto.innerHTML += `<p>${paivamaara}: ${i + 1}. lahtö</p>`;
     for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
       // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
       let unixstart = result.data.plan.itineraries[i].legs[j].startTime;
@@ -93,9 +93,6 @@ async function getRoute(start, end) {
       const aikaamatkaan = (lopputunnit + loppuminuutit.substr(-2)) - (lahtotunnit + lahtominuutit.substr(-2));
       const lahtemisaika = lahtotunnit + '.' + lahtominuutit.substr(-2);
       const pysahdysaika = lopputunnit + '.' + loppuminuutit.substr(-2);
-      if (i === 0) {
-        loppuaikataulukko0.push(pysahdysaika);
-      }
       if (mode === "WALK") {
         mode = ` Kävele ${distance} m (${aikaamatkaan} min)`;
       } else if (mode === "RAIL") {
@@ -103,13 +100,15 @@ async function getRoute(start, end) {
       } else if (mode === "BUS") {
         mode = ` Matkusta bussilla ${distance} m (${aikaamatkaan} min)`;
       }
-      const uusi = 'Klo: ' + lahtemisaika + ' - ' +
-          pysahdysaika + mode + '<p></p>';
-      // lisätään muuttuja uusi, joka sisältää lähtemisajat ja päivämäärä sivulle
+      const uusi = `<p>Klo: ${lahtemisaika} - ${pysahdysaika} ${mode}</p>`;
+      // lisätään muuttuja uusi, joka sisältää lähtemis- ja pysähdysajat, kuljetusvälineen ja ajan sivulle
       lahto.innerHTML += uusi;
     }
   }
-  console.log(loppuaikataulukko0[loppuaikataulukko0.length -1]);
+
+  clickable.addEventListener('click', function() {
+    document.getElementById('startTime').classList.toggle('hide');
+  });
 
   // TODO:
   // Oma layeri reitti polygonille

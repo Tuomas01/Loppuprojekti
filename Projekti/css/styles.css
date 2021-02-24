@@ -131,3 +131,13 @@ input {
 [list]::-webkit-calendar-picker-indicator {
   display: none;
 }
+
+.hide {
+  display: none;
+}
+
+#ajat {
+  width: 100%;
+  height: 434px;
+  overflow: auto;
+}
