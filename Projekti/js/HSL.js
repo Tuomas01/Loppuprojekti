@@ -1,4 +1,10 @@
 'use strict';
+
+function naytatiedot(element) {
+  console.log(element);
+  const divi = document.getElementById(element);
+  divi.classList.toggle('show');
+}
 // Hae lat ja long arvot HSL apista
 async function getRoutePoints(start, end) {
   const queryFrom = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${start}&size=1`);
@@ -63,12 +69,14 @@ async function getRoute(start, end) {
   const result = await response.json();
   const lahto = document.getElementById('startTime');
   const ajatpvm = document.getElementById('pvm');
-  const clickable = document.getElementById('ajat');
   console.log(result);
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
     // lisää päivämäärä enne jokaista matkaa erottaakseen matkat toisistaan
     const paivamaara = today.getDate() + '.' + (today.getMonth() + 1);
     lahto.innerHTML += `<p>${paivamaara}: ${i + 1}. lahtö</p>`;
+    const nappula = `
+                    <button id="button${i}" onclick="naytatiedot('lahto${i}')">Lähtö ${i + 1}</button><article id="lahto${i}" class="hide">`;
+    lahto.innerHTML += nappula
     for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
       // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
       let unixstart = result.data.plan.itineraries[i].legs[j].startTime;
@@ -100,15 +108,17 @@ async function getRoute(start, end) {
       } else if (mode === "BUS") {
         mode = ` Matkusta bussilla ${distance} m (${aikaamatkaan} min)`;
       }
-      const uusi = `<p>Klo: ${lahtemisaika} - ${pysahdysaika} ${mode}</p>`;
+      const tiedot = document.createElement('p');
+      const teksti = document.createTextNode(`Klo: ${lahtemisaika} - ${pysahdysaika} ${mode}`);
+      tiedot.appendChild(teksti);
+      document.getElementById('lahto' + i).appendChild(tiedot);
       // lisätään muuttuja uusi, joka sisältää lähtemis- ja pysähdysajat, kuljetusvälineen ja ajan sivulle
-      lahto.innerHTML += uusi;
+      /*document.getElementById('button' + i).addEventListener('click', function() {
+        naytatiedot("lahto" + i);
+      });*/
     }
   }
 
-  clickable.addEventListener('click', function() {
-    document.getElementById('startTime').classList.toggle('hide');
-  });
 
   // TODO:
   // Oma layeri reitti polygonille
