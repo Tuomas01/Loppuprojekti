@@ -23,7 +23,7 @@ function getOptionsFrom(text) {
   // Tämä siksi ettei jokaisen kirjoitetun kirjaimen jälkeen tehtäisi samantien hakua
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
-    const response = await fetch(`https://api.digitransit.fi/geocoding/v1/autocomplete?text=${text}`);
+    const response = await fetch(`https://api.digitransit.fi/geocoding/v1/autocomplete?text=${text}&boundary.rect.min_lat=59.9&boundary.rect.max_lat=60.45&boundary.rect.min_lon=24.3&boundary.rect.max_lon=25.5`);
     const data = await response.json();
     const suggested = data.features;
     const list = document.getElementById('optionsFrom');
