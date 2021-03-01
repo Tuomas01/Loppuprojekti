@@ -67,16 +67,20 @@ async function getRoute(start, end) {
   };
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
+  // hae id, johon tiedot lisätään
   const lahto = document.getElementById('startTime');
-  const ajatpvm = document.getElementById('pvm');
   console.log(result);
+  // Looppi, joka käy läpi itinararies taulukkoa
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
     // lisää päivämäärä enne jokaista matkaa erottaakseen matkat toisistaan
     const paivamaara = today.getDate() + '.' + (today.getMonth() + 1);
     lahto.innerHTML += `<p>${paivamaara}: ${i + 1}. lahtö</p>`;
+    // Luodaan nappulat sivulle, joista voi togglettaa matkojen tietoja
     const nappula = `
                     <button id="button${i}" onclick="naytatiedot('lahto${i}')">Lähtö ${i + 1}</button><article id="lahto${i}" class="hide">`;
+    // Lisätään nappulat sivulle
     lahto.innerHTML += nappula
+    // Looppi, joka käy läpi legs-taulukkoa, joka on itinararies taulukon sisällä (sisäkkäinen for looppi)
     for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
       // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
       let unixstart = result.data.plan.itineraries[i].legs[j].startTime;
@@ -90,7 +94,6 @@ async function getRoute(start, end) {
       // Hae tunnit unix ajoista
       const lahtotunnit = lahtoaika.getHours();
       const lopputunnit = loppuaika.getHours();
-      const viimeinen = [result.data.plan.itineraries[i].legs.length -1];
       /* hae minuutit, lisää 0, jotta minuutit alle 10 näkyvät oikein esim.
          11.07.02 eikä 11.7.2 ja muunna minuutit numerosta merkkijonoksi nollan avulla */
       const lahtominuutit = "0" + lahtoaika.getMinutes();
@@ -101,6 +104,7 @@ async function getRoute(start, end) {
       const aikaamatkaan = (lopputunnit + loppuminuutit.substr(-2)) - (lahtotunnit + lahtominuutit.substr(-2));
       const lahtemisaika = lahtotunnit + '.' + lahtominuutit.substr(-2);
       const pysahdysaika = lopputunnit + '.' + loppuminuutit.substr(-2);
+      // Muuta mode muuttujaan, millä tavalla matkustetaan ja lisää aika, joka kuluu matkaan
       if (mode === "WALK") {
         mode = ` Kävele ${distance} m (${aikaamatkaan} min)`;
       } else if (mode === "RAIL") {
@@ -108,14 +112,12 @@ async function getRoute(start, end) {
       } else if (mode === "BUS") {
         mode = ` Matkusta bussilla ${distance} m (${aikaamatkaan} min)`;
       }
+      // Luo p tägi ja teksti p tägien sisään
       const tiedot = document.createElement('p');
       const teksti = document.createTextNode(`Klo: ${lahtemisaika} - ${pysahdysaika} ${mode}`);
       tiedot.appendChild(teksti);
+      // lisää ptägit article tagin sisään
       document.getElementById('lahto' + i).appendChild(tiedot);
-      // lisätään muuttuja uusi, joka sisältää lähtemis- ja pysähdysajat, kuljetusvälineen ja ajan sivulle
-      /*document.getElementById('button' + i).addEventListener('click', function() {
-        naytatiedot("lahto" + i);
-      });*/
     }
   }
 
