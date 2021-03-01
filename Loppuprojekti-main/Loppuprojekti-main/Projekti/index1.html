@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--Add leaflet library from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+  <script
+    src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
+  <script src="vendor/code.min.js"></script>
+  <script src="vendor/Polyline.encoded.js"></script>
+  <!--Leaflet END-->
+
+  <!--Cluster markers on map -->
+  <link rel="stylesheet" href="vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css">
+  <script src="vendor/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
+  <!--Cluster END -->
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+
+  <title>Kartta</title>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <h1>EasyTravel</h1>
+    </nav>
+  </header>
+  <main>
+    <aside id="aside">
+      <section>
+        <form onsubmit="showRoute(); return false" id='fields'>
+          <input type='text' id='from' placeholder="Syötä lähtöpaikka" list='optionsFrom' autocomplete="off" required>
+          <datalist id="optionsFrom">
+          </datalist>
+          <input type='text' id='to' placeholder="Syötä määränpää" list='optionsTo' autocomplete="off" required>
+          <datalist id="optionsTo">
+          </datalist>
+          <button type="submit" id='hsl'>Näytä reitti</button>
+        </form>
+        <!-- <button id='findBtn' onclick="findMe()">Find me</button> -->
+      </section>
+      <section id='filter'>
+        <div class="option">
+          <label>Sähköauton latauspiste</label>
+          <input id='sahkoAuto' type='checkbox' class="filtered">
+        </div>
+        <div class="option">
+          <label>Ilmainen</label>
+          <input id='ilmainen' type='checkbox' class="filtered">
+        </div>
+        <div class="option">
+          <label>Vyöhykkeet</label>
+          <button id='zoneA' class="zones filtered selected">A</button>
+          <button id='zoneB' class="zones filtered selected">B</button>
+          <button id='zoneC' class="zones filtered selected">C</button>
+          <button id='zoneD' class="zones filtered selected">D</button>
+          <button id='muut' class="zones filtered selected">Muut</button>
+        </div>
+      </section>
+      <div id="ajat">
+        <p>Ajat:</p>
+        <p id="startTime"></p>
+      </div>
+    </aside>
+    <section id='map'></section>
+  </main>
+  <script src="./js/icons.js"></script>
+  <script src="./js/addZoneProp.js"></script>
+  <script src="./js/checkIfInsideZone.js"></script>
+  <script src="./js/clearMarkers.js"></script>
+  <script src="./js/filterData.js"></script>
+  <script src="./js/autofillAddress.js"></script>
+  <script src="./js/getData.js"></script>
+  <script src="./js/getCoords.js"></script>
+  <script src="./js/regionData.js"></script>
+  <script src="./js/map.js"></script>
+  <script src="./js/HSL.js"></script>
+  <script src="./js/zoneListeners.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+
+</html>
