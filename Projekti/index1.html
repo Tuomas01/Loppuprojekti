@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fi">
 
 <head>
   <meta charset="UTF-8">
@@ -25,6 +25,8 @@
   <!--Cluster END -->
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
 
   <title>Kartta</title>
 </head>
@@ -32,20 +34,20 @@
 <body>
   <header>
     <nav>
-      <h1>HEADER</h1>
+      <h1>EasyTravel</h1>
     </nav>
   </header>
   <main>
     <aside id="aside">
-      <section id='fields'>
-        <form onsubmit="showRoute(); return false">
-          <input type='text' id='from' placeholder="FROM" list='optionsFrom' autocomplete="off" required>
+      <section>
+        <form onsubmit="showRoute(); return false" id='fields'>
+          <input type='text' id='from' placeholder="Syötä lähtöpaikka" list='optionsFrom' autocomplete="off" required>
           <datalist id="optionsFrom">
           </datalist>
-          <input type='text' id='to' placeholder="TO" list='optionsTo' autocomplete="off" required>
+          <input type='text' id='to' placeholder="Syötä määränpää" list='optionsTo' autocomplete="off" required>
           <datalist id="optionsTo">
           </datalist>
-          <button type="submit" id='hsl'>Show route</button>
+          <button type="submit" id='hsl'>Näytä reitti</button>
         </form>
         <!-- <button id='findBtn' onclick="findMe()">Find me</button> -->
       </section>
@@ -66,11 +68,11 @@
           <button id='zoneD' class="zones filtered selected">D</button>
           <button id='muut' class="zones filtered selected">Muut</button>
         </div>
-        <!-- <div class="option">
-          <label>Näytä vyöhykkeet</label>
-          <input oninput="drawRegions()" id='hslAlue' type='checkbox'>
-        </div> -->
       </section>
+      <div id="ajat">
+        <p>Ajat:</p>
+        <p id="startTime"></p>
+      </div>
     </aside>
     <section id='map'></section>
   </main>

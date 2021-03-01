@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  font-family: "Source Sans Pro", sans-serif;
 }
 body {
   padding: 0;
@@ -15,7 +16,8 @@ nav {
   max-width: 100%;
   margin-left: 20px;
   height: 5%;
-  background-color: lightgreen;
+  background-color: lightblue;
+  font-family: "Libre Baskerville", serif;
 }
 
 nav h1 {
@@ -33,7 +35,6 @@ main {
   margin-right: 0;
   padding-left: 20px;
   padding-right: 10px;
-  align-items: stretch;
 }
 
 #map {
@@ -55,22 +56,25 @@ main {
 }
 
 #from,
-#to,
-#hsl {
+#to {
+  padding: 20px;
+  font-size: 1rem;
   text-align: center;
-  width: 100%;
   height: 25px;
+  width: 85%;
+  margin: auto;
+}
+
+#to {
+  margin-top: 20px;
 }
 
 #hsl {
-  background-color: pink;
-}
-
-#showDataBtn {
-  background-color: rgb(1, 88, 250);
-  color: antiquewhite;
-  font-weight: 600;
-  padding-right: 10px;
+  background-color: lightblue;
+  font-weight: 500;
+  margin: 15px auto;
+  font-size: 1.2rem;
+  border-radius: 10px;
 }
 
 #clearMarkersBtn {
@@ -88,7 +92,8 @@ main {
 .option {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 85%;
+  margin: 0 auto;
 }
 
 input {
@@ -138,4 +143,18 @@ button {
 
 .selected {
   background: lightblue;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+#ajat {
+  width: 100%;
+  height: 434px;
+  overflow: auto;
 }
