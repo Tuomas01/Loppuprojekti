@@ -20,9 +20,10 @@ async function main() {
 
   // Lisää parkkipaikat kartalle
   async function showData(arr) {
+    const editedData = addZoneProp(arr);
     // Tallenna filtteröity data muuttujaan
     // filteredData() palauttaa arrayn
-    const filtered = await filteredData(arr);
+    const filtered = await filteredData(await editedData);
     // Create group for clustering markers
     const markers = new L.MarkerClusterGroup();
 
@@ -35,7 +36,8 @@ async function main() {
         <p>Katuosoite: ${place.attributes.OSOITEFI || 'Katuosoite ei saatavilla'} </p>
         <p>Paikkoja: ${place.attributes.PAIKKOJA || 'Paikkatietoja ei saatavilla'}</p>
         <p>Parkkimaksu: ${place.attributes.HINTAFI || 'Parkkimaksutietoja ei saatavilla'}</p>
-        <p>Latauspisteitä sähköautoille: ${place.attributes.SAHKOAUTO}</p>`;
+        <p>Latauspisteitä sähköautoille: ${place.attributes.SAHKOAUTO || 0}</p>
+        <p>Vyöhyke: ${place.attributes.ZONE || 'Ei HSL-alueella'}</p>`;
 
       // Sijaintitiedot ovat polygoneja (maalattu alue kartalla)
       // getCoordinates() palauttaa polygonin keskuskohdan sijainnin latitude ja longitude arvoina
@@ -59,16 +61,7 @@ async function main() {
   // Jos checkboxin arvo vaihtuu näytä filtteröity data kartalla
   function addListeners() {
     const elements = document.getElementsByClassName('filtered');
-    Array.from(elements, (c) => c.addEventListener('change', () => showData(parkingData)));
-  }
-
-  // Tyhjennä markkerit (parkkipaikat) kartalta
-  function clearMarkers() {
-    map.eachLayer((layer) => {
-      if (layer instanceof L.MarkerClusterGroup) {
-        map.removeLayer(layer);
-      }
-    });
+    Array.from(elements, (c) => c.addEventListener('click', () => showData(parkingData)));
   }
 
   function clickZoom(e) {
@@ -80,6 +73,7 @@ async function main() {
   }
   // Lisää eventhandlerit DOMiin
   addListeners();
+  zoneListeners();
   // Lisää kaikki parkkipaikat kartalle (ensimmäinen lataus)
   showData(parkingData);
 }

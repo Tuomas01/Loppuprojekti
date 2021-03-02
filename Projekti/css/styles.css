@@ -1,6 +1,10 @@
 * {
   box-sizing: border-box;
 }
+h1 {
+  margin: 0;
+  padding: 0;
+}
 body {
   padding: 0;
   margin: 0;
@@ -13,7 +17,7 @@ body {
 
 nav {
   max-width: 100%;
-  margin-left: 20px;
+  padding-left: 20px;
   height: 5%;
   background-color: lightgreen;
 }
@@ -116,7 +120,7 @@ input {
     justify-content: space-between;
   }
   #map {
-    width: 80%;
+    width: 100%;
     height: 70%;
     margin: 10px auto;
     order: 2;
@@ -132,6 +136,14 @@ input {
   display: none;
 }
 
+button {
+  cursor: pointer;
+}
+
+.selected {
+  background: lightblue;
+}
+
 .hide {
   display: none;
 }
@@ -144,4 +156,8 @@ input {
   width: 100%;
   height: 434px;
   overflow: auto;
+}
+
+#videobody {
+  padding: 20px;
 }
