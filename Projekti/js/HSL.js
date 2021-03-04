@@ -237,10 +237,10 @@ async function getRoute(start, end) {
         img.src = 'img/bus.svg';
       } else if (mode === 'SUBWAY') {
         mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
-        img.src = 'img/train.svg';
+        img.src = 'img/subway.svg';
       } else if (mode === 'TRAM') {
         mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
-        img.src = 'img/train.svg';
+        img.src = 'img/tram.svg';
       } else {
         mode = 'Ei tietoa saatavilla';
       }
