@@ -126,7 +126,7 @@ async function getRoute(start, end) {
           color = '#8c4799';
           break;
         case 'TRAM':
-          color = 'magenta';
+          color = '#00985f';
           break;
         case 'SUBWAY':
           color = '#ff6319';
@@ -279,7 +279,7 @@ async function getRoute(start, end) {
         color = '#8c4799';
         break;
       case 'TRAM':
-        color = 'magenta';
+        color = '#00985f';
         break;
       case 'SUBWAY':
         color = '#ff6319';
