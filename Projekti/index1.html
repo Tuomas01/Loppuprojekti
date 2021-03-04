@@ -24,6 +24,7 @@
   <script src="vendor/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
   <!--Cluster END -->
   <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/header.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
@@ -32,26 +33,25 @@
 </head>
 
 <body>
-  <header>
-    <nav>
-      <h1>EasyTravel</h1>
-    </nav>
-  </header>
   <main>
     <aside id="aside">
-      <section>
-        <form onsubmit="showRoute(); return false" id='fields'>
-          <input type='text' id='from' placeholder="Syötä lähtöpaikka" list='optionsFrom' autocomplete="off" required>
-          <datalist id="optionsFrom">
-          </datalist>
-          <input type='text' id='to' placeholder="Syötä määränpää" list='optionsTo' autocomplete="off" required>
-          <datalist id="optionsTo">
-          </datalist>
-          <button type="submit" id='hsl'>Näytä reitti</button>
-        </form>
-        <!-- <button id='findBtn' onclick="findMe()">Find me</button> -->
-      </section>
-      <section id='filter'>
+      <nav class="header">
+        <a href="index1.html" class="logo">EasyTravel</a>
+        <div class="header-right">
+          <a href="videosivu.html">Videosivu</a>
+          <a href="index1.html">Info</a>
+        </div>
+      </nav>
+      <form onsubmit="showRoute(); return false" id='fields'>
+        <input type='text' id='from' placeholder="Syötä lähtöpaikka" list='optionsFrom' autocomplete="off" required>
+        <datalist id="optionsFrom">
+        </datalist>
+        <input type='text' id='to' placeholder="Syötä määränpää" list='optionsTo' autocomplete="off" required>
+        <datalist id="optionsTo">
+        </datalist>
+        <button type="submit" id='hsl'>Hae reitti</button>
+      </form>
+      <fieldset id='filter'>
         <div class="option">
           <label>Sähköauton latauspiste</label>
           <input id='sahkoAuto' type='checkbox' class="filtered">
@@ -68,13 +68,9 @@
           <button id='zoneD' class="zones filtered selected">D</button>
           <button id='muut' class="zones filtered selected">Muut</button>
         </div>
-      </section>
-      <div id="ajat">
-        <p>Ajat:</p>
-        <p id="startTime"></p>
-      </div>
+      </fieldset>
     </aside>
-    <section id='map'></section>
+    <map name='map' id='map'></map>
   </main>
   <script src="./js/icons.js"></script>
   <script src="./js/addZoneProp.js"></script>

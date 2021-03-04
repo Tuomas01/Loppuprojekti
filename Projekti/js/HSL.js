@@ -1,8 +1,3 @@
-function naytatiedot(element) {
-  const divi = document.getElementById(element);
-  divi.classList.toggle('show');
-}
-
 // Hae lat ja long arvot HSL apista
 async function getRoutePoints(start, end) {
   const queryFrom = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${start}&size=1`);
@@ -10,6 +5,8 @@ async function getRoutePoints(start, end) {
 
   const from = await queryFrom.json();
   const to = await queryTo.json();
+
+  if (from.features.length === 0 || to.features.length === 0) return false;
 
   const coordinates = {
     from: {
@@ -20,7 +17,6 @@ async function getRoutePoints(start, end) {
       lat: to.features[0].geometry.coordinates[1],
       lon: to.features[0].geometry.coordinates[0],
     },
-
   };
   return coordinates;
 }
@@ -30,25 +26,51 @@ async function getRoute(start, end) {
   const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
   // GraphQL haku
   const route = await getRoutePoints(start, end);
+
+  if (!route) {
+    alert('No routes found');
+    return false;
+  }
   const query = `{
     plan(
       from: {lat: ${route.from.lat}, lon: ${route.from.lon}}
       to: {lat: ${route.to.lat}, lon: ${route.to.lon}}
     ) {
-      itineraries {
+      itineraries{
+        walkDistance,
+        duration,
         legs {
+          mode
           startTime
           endTime
-          mode
-          duration
+          from {
+            lat
+            lon
+            name
+            stop {
+              code
+              name
+            }
+          },
+          to {
+            lat
+            lon
+            name
+          },
+          agency {
+            gtfsId
+      name
+          }
           distance
           legGeometry {
+            length
             points
           }
         }
       }
     }
   }`;
+  map.flyTo(route.from, 14);
 
   const fetchOptions = {
     method: 'POST',
@@ -61,16 +83,104 @@ async function getRoute(start, end) {
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
 
+  if (!result) console.log('jeå');
+
   // hae id, johon tiedot lisätään
-  const lahto = document.getElementById('startTime');
-  lahto.innerHTML = '';
-  console.log(result);
-  // Looppi, joka käy läpi itinararies taulukkoa
+  const lahto = document.createElement('p');
+  lahto.id = 'startTime';
+  const section = document.createElement('section');
+  section.id = 'ajat';
+  const aside = document.getElementById('aside');
+  aside.removeChild(aside.lastChild);
+  document.getElementById('aside').appendChild(section);
+
+  // Näytä tarkemmat tiedot reitistä
+  function naytatiedot(element) {
+    const divi = document.getElementById(element);
+    divi.classList.toggle('show');
+    if (divi.classList.length > 1) return false;
+  }
+
+  function poistaReittiKartalta(id) {
+  // Poista valittu reitti kartalta
+    map.eachLayer((layer) => {
+      if (layer.options.id === id) layer.remove();
+    });
+  }
+
+  // Piirrä klikattu reitti kartalle
+  function reittiKartalle(reitti, id) {
+    // Määrittele värit reitillä
+    reitti.forEach((point) => {
+      let color = '';
+      let dashArray = '';
+      switch (point.mode) {
+        case 'WALK':
+          color = 'black';
+          dashArray = '5,10';
+          break;
+        case 'BUS':
+          color = '#007ac9';
+          break;
+        case 'RAIL':
+          color = '#8c4799';
+          break;
+        case 'TRAM':
+          color = 'magenta';
+          break;
+        case 'SUBWAY':
+          color = '#ff6319';
+          break;
+        default:
+          color = 'blue';
+          break;
+      }
+      const route = point.legGeometry.points;
+      const points = L.Polyline
+        .fromEncoded(route)
+        .getLatLngs();
+
+      L.polyline(points)
+        .setStyle({
+          color,
+          dashArray,
+          id,
+        })
+        .addTo(map);
+    });
+  }
+
+  // Looppi, joka käy läpi itineraries taulukkoa
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
+    const reitti = result.data.plan.itineraries[i].legs;
+    const kestoSekunteina = result.data.plan.itineraries[i].duration;
+    const kestoMinuutteina = Math.round(kestoSekunteina / 60);
+
     // Luodaan nappulat sivulle, joista voi togglettaa matkojen tietoja
-    const nappula = `</br> 
-                    <button id="button${i}" onclick="naytatiedot('lahto${i}')">Lähtö ${i + 1}</button><article id="lahto${i}" class="hide">`;
-    lahto.innerHTML += nappula;
+    const nappula = document.createElement('button');
+    nappula.className = 'lahdot';
+    nappula.id = `button${i}`;
+    nappula.innerText = `Lähtö ${i + 1} (${kestoMinuutteina} min)`;
+
+    // Napin onclick funktio
+    nappula.addEventListener('click', () => {
+      const id = `lahto${i}`;
+      const element = document.getElementById(id);
+      naytatiedot(id);
+      if (element.classList.length > 1) reittiKartalle(reitti, `line${i}`);
+      else {
+        poistaReittiKartalta(`line${i}`);
+      }
+    });
+
+    // Luodaan article johon liitetään tietoja reitistä
+    const article = document.createElement('article');
+    article.id = `lahto${i}`;
+    article.className = 'hide';
+
+    lahto.appendChild(nappula);
+    lahto.appendChild(article);
+    document.getElementById('ajat').appendChild(lahto);
 
     // Looppi, joka käy läpi legs-taulukkoa, joka on itinararies taulukon sisällä (sisäkkäinen for looppi)
     for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
@@ -92,50 +202,68 @@ async function getRoute(start, end) {
       const loppuminuutit = `0${loppuaika.getMinutes()}`;
       // lisätään päivämäärä ja lähtemisaika muuttujaan
       // miinustetaan minuuteista ensimmäiset 2 numeroa, jotta minuutit näkyvät oikeassa muodossa
-      const aikaamatkaan = (lopputunnit + loppuminuutit.substr(-2)) - (lahtotunnit + lahtominuutit.substr(-2));
       const lahtemisaika = `${lahtotunnit}.${lahtominuutit.substr(-2)}`;
       const pysahdysaika = `${lopputunnit}.${loppuminuutit.substr(-2)}`;
+      const kilometrit = (distance / 1000).toFixed(1);
+      let loppu = result.data.plan.itineraries[i].legs[j].to.name;
+      let alku = result.data.plan.itineraries[i].legs[j].from.name;
+
+      const info = document.createElement('div');
+      info.id = 'info';
+
+      const img = document.createElement('img');
+      img.className = 'transport';
+
+      if (alku === 'Origin') {
+        console.log(alku);
+        alku = document.getElementById('from').value.split(' ')[0];
+        alku = alku.charAt(0).toUpperCase() + alku.slice(1);
+      }
+
+      if (loppu === 'Destination') {
+        loppu = document.getElementById('to').value.split(' ')[0];
+        loppu = loppu.charAt(0).toUpperCase() + loppu.slice(1);
+      }
 
       // Muuta mode muuttujaan, millä tavalla matkustetaan ja lisää aika, joka kuluu matkaan
       if (mode === 'WALK') {
-        mode = ` Kävele ${distance} m (${aikaamatkaan} min)`;
+        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        img.src = 'img/walking.svg';
       } else if (mode === 'RAIL') {
-        mode = ` Matkusta junalla ${distance} m (${aikaamatkaan} min)`;
+        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        img.src = 'img/train.svg';
       } else if (mode === 'BUS') {
-        mode = ` Matkusta bussilla ${distance} m (${aikaamatkaan} min)`;
+        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        img.src = 'img/bus.svg';
       } else if (mode === 'SUBWAY') {
-        mode = ` Matkusta metrolla ${distance} m (${aikaamatkaan} min)`;
+        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        img.src = 'img/train.svg';
+      } else if (mode === 'TRAM') {
+        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        img.src = 'img/train.svg';
+      } else {
+        mode = 'Ei tietoa saatavilla';
       }
 
       // Luo p tägi ja teksti p tägien sisään
       const tiedot = document.createElement('p');
-      const teksti = document.createTextNode(`Klo: ${lahtemisaika} - ${pysahdysaika} ${mode}`);
+      const teksti = document.createTextNode(`${mode}`);
+      const aika = document.createElement('p');
+      aika.innerText = `${lahtemisaika} - ${pysahdysaika}`;
+      aika.className = 'aika';
       tiedot.appendChild(teksti);
+      info.appendChild(aika);
+      info.appendChild(tiedot);
+      info.appendChild(img);
       // lisää ptägit article tagin sisään
-      document.getElementById(`lahto${i}`).appendChild(tiedot);
-      // lisätään muuttuja uusi, joka sisältää lähtemis- ja pysähdysajat, kuljetusvälineen ja ajan sivulle
-      /* document.getElementById('button' + i).addEventListener('click', function() {
-        naytatiedot("lahto" + i);
-      }); */
+      document.getElementById(`lahto${i}`).appendChild(info);
     }
   }
 
   console.log(result);
 
-  // TODO:
-  // Oma layeri reitti polygonille
-
-  // Poista vanha reitti ennen uuden reitin lisäämistä kartalle
-  // Tämä on vasta ns. "purkkaratkaisu", mutta toimii
-  map.eachLayer((layer) => {
-    if (layer._path != null) {
-      if (!layer._latlngs[0].length) layer.remove();
-    }
-  });
-
-  // Määrittele värit reitillä
-  // Esim. kävelypätkä = vihreä
-  // Nämä ovat vain placeholdereita
+  // Näytä ensimmäinen reitti aina haun jälkeen kartalla
+  naytatiedot('lahto0');
   result.data.plan.itineraries[0].legs.forEach((point) => {
     let color = '';
     let dashArray = '';
@@ -165,14 +293,16 @@ async function getRoute(start, end) {
       .fromEncoded(route)
       .getLatLngs();
 
-    if (points instanceof L.Polyline) console.log('hepp');
     // Lisää tyylit reitille ja piirrä se kartalle
-    L.polyline(points)
-      .setStyle({
-        color,
-        dashArray,
-      })
-      .addTo(map);
+    if (!(points instanceof L.Polyline)) {
+      L.polyline(points)
+        .setStyle({
+          color,
+          dashArray,
+          id: 'line0',
+        })
+        .addTo(map);
+    }
   });
 }
 

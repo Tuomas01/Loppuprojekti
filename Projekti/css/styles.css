@@ -1,8 +1,8 @@
 * {
   box-sizing: border-box;
-  font-family: "Source Sans Pro", sans-serif;
 }
 body {
+  font-family: "Lato", sans-serif;
   padding: 0;
   margin: 0;
 }
@@ -12,69 +12,58 @@ body {
   width: 100%;
 }
 
-nav {
-  max-width: 100%;
-  margin-left: 20px;
-  height: 5%;
-  background-color: lightblue;
-  font-family: "Libre Baskerville", serif;
-}
-
-nav h1 {
-  text-align: center;
-}
-
 main {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   display: flex;
 }
 
 #aside {
-  min-width: 450px;
-  margin-right: 0;
-  padding-left: 20px;
+  min-width: 500px;
+  padding-top: 10px;
+  padding-left: 10px;
   padding-right: 10px;
 }
 
 #map {
-  min-width: 75%;
+  width: 100%;
   max-height: 80%;
 }
 
 #fields {
+  margin-top: 30px;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
 }
 
-#showDataBtn,
-#clearMarkersBtn {
-  width: 50%;
-  margin-top: 5px;
-  padding: 5px;
-}
-
 #from,
 #to {
-  padding: 20px;
-  font-size: 1rem;
+  margin-top: 15px;
   text-align: center;
-  height: 25px;
-  width: 85%;
-  margin: auto;
-}
-
-#to {
-  margin-top: 20px;
+  width: 100%;
+  height: 45px;
+  font-size: 15px;
+  border-radius: 5px;
+  margin-left: 10%;
+  margin-right: 10%;
+  border: solid 1px #888888;
 }
 
 #hsl {
-  background-color: lightblue;
-  font-weight: 500;
+  width: 50%;
+  height: 45px;
+  background-color: #0a0a0b;
+  color: white;
+  padding: 5px;
   margin: 15px auto;
-  font-size: 1.2rem;
-  border-radius: 10px;
+}
+
+#showDataBtn {
+  background-color: rgb(1, 88, 250);
+  color: antiquewhite;
+  font-weight: 600;
+  padding-right: 10px;
 }
 
 #clearMarkersBtn {
@@ -85,15 +74,16 @@ main {
 }
 
 #filter {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
+  margin-top: 20px;
+  margin: 20px auto;
 }
 
 .option {
   display: flex;
   justify-content: space-between;
-  width: 85%;
-  margin: 0 auto;
+  width: 100%;
 }
 
 input {
@@ -104,45 +94,52 @@ input {
   color: red !important;
 }
 
-@media only screen and (max-width: 768px) {
-  nav {
-    margin: 10px;
-  }
-  main {
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  #aside {
-    min-width: 100%;
-    padding: 10px;
-    order: 1;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  #map {
-    width: 100%;
-    height: 70%;
-    margin: 10px auto;
-    order: 2;
-  }
-  #fields {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-  }
+#startTime {
+  margin: 30px;
+}
+
+#ajat {
+  margin-top: 10px;
+  width: 100%;
+  overflow: auto;
+  max-height: 500px;
+}
+
+.lahdot {
+  margin: 10px auto;
+  width: 100%;
+  text-align: left;
 }
 
 [list]::-webkit-calendar-picker-indicator {
   display: none;
 }
 
+fieldset {
+  border: none;
+}
+
 button {
+  display: inline-block;
+  padding: 10px 15px;
+  font-size: 15px;
   cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+button:active {
+  background-color: #999;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
 }
 
 .selected {
-  background: lightblue;
+  background: #829fff;
 }
 
 .hide {
@@ -153,8 +150,94 @@ button {
   display: block;
 }
 
-#ajat {
-  width: 100%;
-  height: 434px;
-  overflow: auto;
+@media only screen and (max-width: 1000px) {
+  .header {
+    width: 100%;
+  }
+  main {
+    height: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  #ajat {
+    height: 250px;
+    overflow: auto;
+  }
+
+  #from,
+  #to {
+    margin-left: 20%;
+    margin-right: 20%;
+  }
+  #hsl {
+    margin-left: 30%;
+    margin-right: 30%;
+  }
+  #aside {
+    min-width: 100%;
+    width: 30%;
+    padding: 10px;
+    padding-top: 0px;
+    order: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  #map {
+    min-width: 80%;
+    height: 70%;
+    margin: 10px 10px;
+    order: 2;
+  }
+  #fields {
+    width: 100%;
+    margin-top: 30px;
+  }
+  #startTime {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
+/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
+@media screen and (max-width: 500px) {
+  #aside {
+    min-width: none;
+    padding: 0;
+  }
+  .header a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .header-right {
+    float: none;
+  }
+
+  #from,
+  #to {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+}
+
+#info {
+  display: flex;
+}
+
+.transport {
+  height: 50px;
+  width: 50px;
+  margin-left: auto;
+  margin-top: 10px;
+}
+
+#info p {
+  flex-basis: 30%;
+}
+
+.aika {
+  padding-left: 10px;
+  width: 20%;
 }
