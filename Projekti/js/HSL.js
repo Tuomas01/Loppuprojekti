@@ -57,9 +57,10 @@ async function getRoute(start, end) {
             lon
             name
           },
-          agency {
-            gtfsId
-      name
+          trip {
+            route {
+              shortName
+            }
           }
           distance
           legGeometry {
@@ -70,7 +71,7 @@ async function getRoute(start, end) {
       }
     }
   }`;
-  map.flyTo(route.from, 14);
+  map.flyTo(route.from, 12);
 
   const fetchOptions = {
     method: 'POST',
@@ -88,11 +89,11 @@ async function getRoute(start, end) {
   // hae id, johon tiedot lisätään
   const lahto = document.createElement('p');
   lahto.id = 'startTime';
-  const section = document.createElement('section');
-  section.id = 'ajat';
+  const ajat = document.createElement('div');
+  ajat.id = 'ajat';
   const aside = document.getElementById('aside');
   aside.removeChild(aside.lastChild);
-  document.getElementById('aside').appendChild(section);
+  document.getElementById('aside').appendChild(ajat);
 
   // Näytä tarkemmat tiedot reitistä
   function naytatiedot(element) {
@@ -173,23 +174,23 @@ async function getRoute(start, end) {
       }
     });
 
-    // Luodaan article johon liitetään tietoja reitistä
-    const article = document.createElement('article');
-    article.id = `lahto${i}`;
-    article.className = 'hide';
+    // Luodaan div johon liitetään tietoja reitistä
+    const div = document.createElement('div');
+    div.id = `lahto${i}`;
+    div.className = 'hide';
 
     lahto.appendChild(nappula);
-    lahto.appendChild(article);
+    lahto.appendChild(div);
     document.getElementById('ajat').appendChild(lahto);
 
     // Looppi, joka käy läpi legs-taulukkoa, joka on itinararies taulukon sisällä (sisäkkäinen for looppi)
-    for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
+    for (let j = 0; j < reitti.length; j++) {
       // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
-      const unixstart = result.data.plan.itineraries[i].legs[j].startTime;
-      const unixend = result.data.plan.itineraries[i].legs[j].endTime;
+      const unixstart = reitti[j].startTime;
+      const unixend = reitti[j].endTime;
       // luodaan muuttuja mode, johon annetaan arvoksi tapa, jolla matkustetaan
-      let { mode } = result.data.plan.itineraries[i].legs[j];
-      const distance = Math.round(result.data.plan.itineraries[i].legs[j].distance);
+      let { mode } = reitti[j];
+      const distance = Math.round(reitti[j].distance);
       // Luo Date objekti ja anna sen arvoksi unix, jotta unix arvo muutetaan date muotoon, eli tallenna unix arvot muuttujiin
       const lahtoaika = new Date(unixstart);
       const loppuaika = new Date(unixend);
@@ -205,17 +206,23 @@ async function getRoute(start, end) {
       const lahtemisaika = `${lahtotunnit}.${lahtominuutit.substr(-2)}`;
       const pysahdysaika = `${lopputunnit}.${loppuminuutit.substr(-2)}`;
       const kilometrit = (distance / 1000).toFixed(1);
-      let loppu = result.data.plan.itineraries[i].legs[j].to.name;
-      let alku = result.data.plan.itineraries[i].legs[j].from.name;
+      let loppu = reitti[j].to.name;
+      let alku = reitti[j].from.name;
 
       const info = document.createElement('div');
-      info.id = 'info';
+      info.className = 'info';
 
       const img = document.createElement('img');
       img.className = 'transport';
 
+      const linjaNro = document.createElement('p');
+      linjaNro.className = 'linja';
+
+      if (reitti[j].trip) {
+        linjaNro.innerHTML = `(${reitti[j].trip.route.shortName})`;
+      }
+
       if (alku === 'Origin') {
-        console.log(alku);
         alku = document.getElementById('from').value.split(' ')[0];
         alku = alku.charAt(0).toUpperCase() + alku.slice(1);
       }
@@ -229,18 +236,23 @@ async function getRoute(start, end) {
       if (mode === 'WALK') {
         mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
         img.src = 'img/walking.svg';
+        img.alt = 'walk';
       } else if (mode === 'RAIL') {
-        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        mode = `Juna ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
         img.src = 'img/train.svg';
+        img.alt = 'railway';
       } else if (mode === 'BUS') {
-        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        mode = `Bussi ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
         img.src = 'img/bus.svg';
+        img.alt = 'bus';
       } else if (mode === 'SUBWAY') {
-        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        mode = `Metro ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
         img.src = 'img/subway.svg';
+        img.alt = 'subway';
       } else if (mode === 'TRAM') {
-        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        mode = `Raitiovaunu ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
         img.src = 'img/tram.svg';
+        img.alt = 'tram';
       } else {
         mode = 'Ei tietoa saatavilla';
       }
@@ -255,7 +267,8 @@ async function getRoute(start, end) {
       info.appendChild(aika);
       info.appendChild(tiedot);
       info.appendChild(img);
-      // lisää ptägit article tagin sisään
+
+      // lisää ptägit div tagin sisään
       document.getElementById(`lahto${i}`).appendChild(info);
     }
   }
@@ -309,6 +322,11 @@ async function getRoute(start, end) {
 // Hae kenttien arvot
 // Piirrä reitti kartalle
 function showRoute() {
+  map.eachLayer((layer) => {
+    if (layer._path != null) {
+      if (!layer._latlngs[0].length) layer.remove();
+    }
+  });
   const from = document.getElementById('from').value;
   const to = document.getElementById('to').value;
   getRoute(from, to);
