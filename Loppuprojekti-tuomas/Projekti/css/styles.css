@@ -1,0 +1,257 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: "Lato", sans-serif;
+  padding: 0;
+  margin: 0;
+}
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+main {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+}
+
+#aside {
+  min-width: 500px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#map {
+  width: 100%;
+  max-height: 80%;
+}
+
+#fields {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+
+#from,
+#to {
+  margin-top: 15px;
+  text-align: center;
+  width: 100%;
+  height: 45px;
+  font-size: 15px;
+  border-radius: 5px;
+  margin-left: 10%;
+  margin-right: 10%;
+  border: solid 1px #888888;
+}
+
+#hsl {
+  width: 50%;
+  height: 45px;
+  background-color: #0a0a0b;
+  color: white;
+  padding: 5px;
+  margin: 15px auto;
+}
+
+#showDataBtn {
+  background-color: rgb(1, 88, 250);
+  color: antiquewhite;
+  font-weight: 600;
+  padding-right: 10px;
+}
+
+#clearMarkersBtn {
+  background-color: red;
+  color: antiquewhite;
+  font-weight: 600;
+  padding: 10px;
+}
+
+.filter {
+  display: none;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  margin: 20px auto;
+}
+
+#filterbutton {
+  background-color: #0a0a0b;
+  color: white;
+}
+
+#filterdiv {
+  text-align: center;
+  margin: 10px 30px 10px 30px;
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+input {
+  margin: 0;
+}
+
+#address option {
+  color: red !important;
+}
+
+#startTime {
+  margin: 30px;
+}
+
+#ajat {
+  margin-top: 20px;
+  width: 100%;
+  overflow: auto;
+  max-height: 600px;
+}
+
+.lahdot {
+  margin: 10px auto;
+  width: 100%;
+  text-align: left;
+}
+
+[list]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+fieldset {
+  border: none;
+}
+
+button {
+  display: inline-block;
+  padding: 10px 15px;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+button:active {
+  background-color: #999;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.selected {
+  background: #829fff;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info p {
+  text-align: left;
+}
+
+.transport {
+  height: 50px;
+  width: 50px;
+
+  margin-top: 10px;
+}
+
+.aika {
+  padding-left: 10px;
+  width: 20%;
+}
+
+.linja {
+  text-align: right;
+  align-items: center;
+  float: right;
+}
+
+@media only screen and (max-width: 1000px) {
+  .header {
+    width: 100%;
+  }
+  main {
+    height: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  #ajat {
+    max-height: 400px;
+  }
+
+  #from,
+  #to {
+    margin-left: 20%;
+    margin-right: 20%;
+  }
+  #hsl {
+    margin-left: 30%;
+    margin-right: 30%;
+  }
+  #aside {
+    min-width: 100%;
+    width: 30%;
+    padding: 0;
+    order: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  #map {
+    min-width: 80%;
+    height: 70%;
+    margin: 10px 10px;
+    order: 2;
+  }
+  #fields {
+    width: 100%;
+    margin-top: 30px;
+  }
+  #startTime {
+    margin-left: 7%;
+    margin-right: 7%;
+  }
+}
+
+/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
+@media screen and (max-width: 48em) {
+  #links {
+    display: none;
+  }
+  .hamburger {
+    display: inline-block;
+    cursor: pointer;
+  }
+  .header a {
+    float: none;
+    text-align: left;
+  }
+
+  #from,
+  #to {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+}
