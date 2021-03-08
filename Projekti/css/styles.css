@@ -2,9 +2,10 @@
   box-sizing: border-box;
 }
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   padding: 0;
   margin: 0;
+  background-color: #f0efeb;
 }
 html,
 body {
@@ -12,82 +13,92 @@ body {
   width: 100%;
 }
 
-nav {
-  max-width: 100%;
-  margin-left: 20px;
-  height: 5%;
-  background-color: #829fff;
-}
-
-nav h1 {
-  text-align: center;
-  border: 1px solid;
-  padding: 10px;
-  box-shadow: 1px 6px #888888;
-}
-
 main {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   display: flex;
 }
-
-#aside {
-  border-style: inset;
-  max-height: 80%;
-  min-width: 450px;
-  margin-left: 15px;
-  margin-right: 15px;
-  padding-top: 10px;
-  padding-left: 20px;
-  padding-right: 10px;
-  align-items: stretch;
+#vaihto {
+  width: 30px;
+  height: 30px;
+  margin: 5px auto 0 auto;
+  cursor: pointer;
 }
 
-header h1{
-  padding: 5px;
+#vaihto:hover {
+  fill: red;
+}
+#aside {
+  min-width: 500px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #map {
-  border-style: inset;
-  min-width: 70%;
+  width: 100%;
   max-height: 80%;
 }
 
+#swipe {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 4000;
+  height: 40px;
+  display: none;
+}
+
+@keyframes up {
+  0% {
+    height: 10%;
+  }
+  100% {
+    height: 50%;
+  }
+}
+
+@keyframes down {
+  0% {
+    height: 50%;
+  }
+  100% {
+    height: 5%;
+  }
+}
+
+#swipe p {
+  text-align: center;
+}
+
 #fields {
+  margin-top: 30px;
+
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
 }
 
-#showDataBtn,
-#clearMarkersBtn {
-  width: 50%;
-  margin-top: 5px;
-  padding: 5px;
-}
-
 #from,
-#to,
-#hsl {
-  margin-top: 15px;
+#to {
   text-align: center;
   width: 100%;
-  height: 25px;
+  height: 45px;
   font-size: 15px;
-
+  border-radius: 5px;
+  margin-left: 10%;
+  margin-right: 10%;
+  border: solid 1px #888888;
 }
 
 #hsl {
-  background-color: #829fff;
+  width: 50%;
+  height: 45px;
+  background-color: #143642;
+  color: white;
   padding: 5px;
-}
-
-#showDataBtn {
-  background-color: rgb(1, 88, 250);
-  color: antiquewhite;
-  font-weight: 600;
-  padding-right: 10px;
+  margin: 15px auto;
+  font-family: "Merriweather", serif;
+  font-size: 13px;
 }
 
 #clearMarkersBtn {
@@ -97,58 +108,88 @@ header h1{
   padding: 10px;
 }
 
-#filter {
-  display: flex;
+.filter {
+  display: none;
   flex-wrap: wrap;
-  margin-top: 20px;
+  margin: 0 auto 10px auto;
+  width: 100%;
+}
+
+#filterdiv {
+  width: 70%;
+  padding-left: 8px;
+}
+
+#filterButton {
+  cursor: pointer;
+  padding-top: 5px;
+  border: 1px solid black;
+  border-radius: 50px;
 }
 
 .option {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 input {
   margin: 0;
 }
 
-#address option {
-  color: red !important;
+#startTime {
+  margin: 0 auto;
 }
 
-@media only screen and (max-width: 768px) {
-  nav {
-    margin: 10px;
-  }
-  main {
+#arrowContainer {
+  width: 100%;
+  cursor: pointer;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  background-color: #f0efeb;
+}
 
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  #aside {
-    min-width: 100%;
-    padding: 10px;
-    order: 1;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  #map {
-    width: 80%;
-    height: 70%;
-    margin: 10px auto;
-    order: 2;
-  }
-  #fields {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-  }
+.arrow-top {
+  cursor: pointer;
+  font-size: 30px;
+  vertical-align: middle;
+}
+
+.tiedot {
+  margin-right: auto;
+  padding: 0 15%;
+  width: 400px;
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
+
+#ajat {
+  margin-top: 20px;
+  width: 100%;
+  overflow: auto;
+  max-height: 600px;
+}
+
+.lahdot {
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  background-color: #143642;
+  color: white;
+  font-family: "Merriweather", serif;
+  margin-bottom: 20px;
 }
 
 [list]::-webkit-calendar-picker-indicator {
   display: none;
+}
+
+fieldset {
+  border: none;
 }
 
 button {
@@ -171,22 +212,123 @@ button:active {
 }
 
 .selected {
-  background: #829fff;
+  background: #143642;
+  color: white;
 }
 
 .hide {
   display: none;
 }
 
+.filtered {
+  margin-left: 5%;
+  padding: 3px 5px;
+  font-size: 13px;
+}
+
 .show {
   display: block;
 }
 
-#ajat {
-  margin-top: 20px;
-  border-style: inset;
-  width: 100%;
-  height: 434px;
-  overflow: auto;
-  margin-bottom: 5px;
+.info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info p {
+  text-align: left;
+}
+
+.transport {
+  height: 50px;
+  width: 50px;
+  margin-top: 10px;
+}
+
+.aika {
+  padding-left: 10px;
+  width: 20%;
+}
+
+.linja {
+  text-align: right;
+  align-items: center;
+  float: right;
+}
+
+@media only screen and (max-width: 1024px) {
+  #ajat {
+    display: none;
+  }
+  .header {
+    width: 100%;
+  }
+  main {
+    height: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  #ajat {
+    max-height: 400px;
+  }
+
+  #swipe {
+    display: block;
+    background-color: #f0efeb;
+  }
+  #from,
+  #to {
+    margin-left: 20%;
+    margin-right: 20%;
+  }
+  #hsl {
+    margin-left: 30%;
+    margin-right: 30%;
+  }
+  #aside {
+    min-width: 100%;
+    width: 30%;
+    padding: 0;
+    order: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  #map {
+    min-width: 100%;
+    height: 60%;
+    margin: 10px 0 0 0;
+    order: 2;
+  }
+  #fields {
+    width: 100%;
+  }
+  #startTime {
+    margin-left: 7%;
+    margin-right: 7%;
+  }
+}
+
+/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */
+@media screen and (max-width: 500px) {
+  #links {
+    display: none;
+  }
+  .header a {
+    float: none;
+    text-align: left;
+  }
+  .header {
+    padding: 5px;
+  }
+
+  #hsl {
+    margin-bottom: 0;
+  }
+  #from,
+  #to {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
 }

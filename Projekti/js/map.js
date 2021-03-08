@@ -3,7 +3,7 @@
 // Zoom level aluksi
 const map = L.map('map', {
   zoomSnap: 1,
-}).setView([60.3733244, 24.8410248], 9);
+}).setView([60.2733244, 24.8410248], 9.5);
 
 // GPS button
 function findMe() {
