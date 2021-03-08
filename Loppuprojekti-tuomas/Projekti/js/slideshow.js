@@ -1,5 +1,7 @@
 'use strict';
 const next = document.getElementById('next');
+const prev = document.getElementById('previous');
+const modaldiv = document.getElementById('modaldiv');
 let slides = document.getElementsByClassName("slides");
 let index = 1;
 
@@ -29,3 +31,39 @@ function showslides(n) {
 next.addEventListener('click', function() {
   seuraava(1);
 });
+
+prev.addEventListener('click', function() {
+  seuraava(-1);
+});
+
+for (let i = 0; i < slides.length; i++) {
+  modaldiv.innerHTML += `<div class="modal" id="modal${i}" style="display: none">
+                            <a id="x${i}" class="x">X</a>
+                            <figure>
+                            <img class="modalcontent" id="img${i}">
+                            <figcaption class="caption">Kuva${i+1}</figcaption>
+                            </figure>
+                         </div>`
+}
+const modal = document.getElementsByClassName('modal');
+const x = document.getElementsByClassName('x');
+for (let i = 0; i < slides.length; i++) {
+  slides[i].addEventListener('click', function() {
+    if (modal[i].style.display === "none") {
+      modal[i].style.display = "block";
+    }
+    x[i].addEventListener('click', function() {
+      console.log('hei');
+      if (modal[i].style.display === "block") {
+        modal[i].style.display = "none";
+      } else {
+        modal[i].style.display = "none";
+      }
+    });
+    const modalimg = document.getElementById(`img${i}`);
+    modalimg.src = "kuvat/parkkipaikka" + i + ".jpg";
+  });
+}
+
+
+
