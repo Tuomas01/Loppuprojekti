@@ -3,34 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/videosivustyles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <title>Videosivu</title>
 </head>
-<body id="videobody">
-    <header>
-        <nav>
-            <h1>EasyTravel videosivu</h1>
-            <a href="videosivu.html">Videosivu</a>
-            <a href="index1.html">Etusivu</a>
-        </nav>
+<body>
+
+<aside id="aside">
+    <header class="header">
+        <a href="index1.html" class="logo">EasyTravel</a>
+        <input class="menu-btn" type="checkbox" id="menu-btn" />
+        <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+        <ul class="menu">
+            <li><a href="videosivu.html">Videosivu</a></li>
+            <li><a href="index1.html">Etusivu</a></li>
+        </ul>
     </header>
-    <main id="videomain">
+</aside>
+<main id="videomain">
         <article>
-            <h2>Projektin video</h2>
+            <h2>EasyTravel mainosvideo</h2>
             <video controls width="750">
                 <source src="" type="video/mp4">
-
                 selaimesi ei tue videota
                 <br>
                 <a href="https://youtu.be/x6nuZhTf2Q0" target="_blank">Linkki videoon</a>
             </video>
+
         </article>
         <article>
-            <h2>Projektin video</h2>
+            <h2>Kuvat</h2>
             <figure>
                 <img src="kuvat/parkkipaikka.jpg" width="500px" alt="parkkipaikka">
             </figure>
         </article>
+
+        <article>
+            <h2>Mainosvideon selostus (alkuperäinen)</h2>
+            <audio controls width="750">
+                <source src="" type="audio/mp3">
+                selaimesi ei tue äänitiedostoa
+            </audio><br>
+            <h2>Mainosvideon selostus (käsitelty - kohina poistettu)</h2>
+            <audio controls width="750">
+                <source src="" type="audio/mp3">
+                selaimesi ei tue äänitiedostoa
+            </audio>
+        </article>
+
     </main>
 </body>
 </html>
