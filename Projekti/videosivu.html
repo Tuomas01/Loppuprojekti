@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/videosivustyles.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Videosivu</title>
 </head>
 <body>
@@ -32,12 +33,30 @@
             </video>
 
         </article>
-        <article>
-            <h2>Kuvat</h2>
-            <figure>
-                <img src="kuvat/parkkipaikka.jpg" width="500px" alt="parkkipaikka">
-            </figure>
+        <article class="kuvat">
+            <h2>Projektin kuvat</h2>
+            <div class="slides" id="slides0">
+                <figure>
+                    <img class="kuva" src="kuvat/parkkipaikka0.jpg" width="500px" height="400px" alt="parkkipaikka">
+                    <figcaption>Kuva1</figcaption>
+                </figure>
+            </div>
+            <div class="slides" id="slides1">
+                <figure>
+                    <img class="kuva" src="kuvat/parkkipaikka1.jpg" width="500px" height="400px" alt="parkkipaikka1">
+                    <figcaption>Kuva2</figcaption>
+                </figure>
+            </div>
+            <div class="slides" id="slides2">
+                <figure>
+                    <img class="kuva" src="kuvat/parkkipaikka2.jpg" width="500px" height="400px" alt="parkkipaikka2">
+                    <figcaption>Kuva3</figcaption>
+                </figure>
+            </div>
+            <span class="fa fa-angle-right" id="next"></span>
+            <span class="fa fa-angle-left" id="previous"></span>
         </article>
+        <div id="modaldiv"></div>
 
         <article>
             <h2>Mainosvideon selostus (alkuperäinen)</h2>
@@ -53,5 +72,6 @@
         </article>
 
     </main>
+<script src="js/slideshow.js"></script>
 </body>
 </html>
