@@ -1,0 +1,33 @@
+.slider {
+  outline: none;
+  -webkit-appearance: none;
+  width: 40px;
+  height: 23px;
+  background-color: gray;
+  border-radius: 50px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  color: black;
+  border-radius: 50px;
+}
+
+input:checked {
+  background-color: #60d394;
+  transition: 0.4s;
+}
+
+input:checked:before {
+  transform: translate(100%);
+  transition: 0.4s;
+}
