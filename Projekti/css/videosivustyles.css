@@ -179,6 +179,12 @@ video {
     line-height: 1.6;
 }
 
+
+#piirros img {
+    width: 400px;
+    height: 600px;
+}
+
 @media only screen and (max-width: 500px) {
     #aside {
         width: 100%;
