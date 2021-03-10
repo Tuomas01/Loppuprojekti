@@ -151,7 +151,7 @@ video {
 .kuvat {
     max-width: 100%;
     position: relative;
-    width: 500px;
+    width: 600px;
     min-height: 300px;
 }
 
@@ -167,6 +167,16 @@ video {
 
 #videosivunuoli {
     padding-right:  5px;
+}
+
+#tiivistelma {
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+#tekstitys {
+    max-width: 600px;
+    line-height: 1.6;
 }
 
 @media only screen and (max-width: 500px) {
