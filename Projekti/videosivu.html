@@ -1,36 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/videosivustyles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Videosivu</title>
 </head>
+
 <body id="videobody">
-    <header>
-        <nav>
-            <h1>EasyTravel videosivu</h1>
-            <a href="videosivu.html">Videosivu</a>
-            <a href="index1.html">Etusivu</a>
-        </nav>
+    <header class="header">
+        <a href="index1.html" class="logo">EasyTravel</a>
+        <input class="menu-btn" type="checkbox" id="menu-btn" />
+        <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+        <ul class="menu">
+            <li><a id="videosivunuoli" class="fa fa-angle-right"><a id="videosivu" href="videosivu.html">Videosivu</a></a></li>
+            <li><a href="index1.html">Etusivu</a></li>
+        </ul>
     </header>
     <main id="videomain">
         <article>
-            <h2>Projektin video</h2>
-            <video controls width="750">
+            <h2>EasyTravel mainosvideo</h2>
+            <video controls>
                 <source src="" type="video/mp4">
-
                 selaimesi ei tue videota
                 <br>
                 <a href="https://youtu.be/x6nuZhTf2Q0" target="_blank">Linkki videoon</a>
             </video>
         </article>
+        <article class="kuvat">
+            <h2>Projektin kuvat</h2>
+            <figure class="slides" id="slides0">
+                <img class="kuva" src="kuvat/parkkipaikka0.jpg" alt="EasyTravel parkkipaikka">
+                <figcaption>EasyTravel parkkipaikka</figcaption>
+            </figure>
+            <figure class="slides" id="slides1">
+                <img class="kuva" src="kuvat/parkkipaikka1.jpg" alt="Luminen parkkipaikka">
+                <figcaption>Luminen parkkipaikka</figcaption>
+            </figure>
+            <figure class="slides" id="slides2">
+                <img class="kuva" src="kuvat/parkkipaikka2.jpg" alt="Pyöräparkki">
+                <figcaption>Pyöräparkki</figcaption>
+            </figure>
+            <a class="fa fa-angle-right" id="next"></a>
+            <a class="fa fa-angle-left" id="previous"></a>
+        </article>
+        <article id="tekstitys">
+            <h2>Videon tekstitys</h2>
+            <p>Tässä on Mete. Metellä on pinna kireällä työpäivän jälkeen ja on suuntaamassa tuttujensa luo töistä.
+                Tässä Niko. Nikoa ei murheet paina, koska hän käyttää sovellusta paikantamaan lähellä olevat parkkipaikat.
+                Mete on jumissa liikennevaloissa, koska hän ei käyttänyt sovellusta paikantamaan parkkipaikkaa, vaan yrittää
+                itse löytää parkkipaikkaa alueelta.
+                Niko pääsi tapahtumaan paikanpäälle ja takaisin kotiin ajallaan ilman ongelmia,
+                koska hän käytti sovellusta paikantamaan parkkipaikkoja.
+                Mete ei löytänyt parkkipaikkaa ja tuli pimeää. Mete joutui nolosti kertomaan tuttavilleen, että ei päässyt
+                vierailemaan tänään ja suuntasi takaisin kotiin.</p>
+        </article>
+        <article id="tiivistelma">
+            <h2>Mainosvideon tiivistelmä</h2>
+            <p>Video kertoo kahdesta henkilöstä, Nikosta ja Metestä. Niko käyttää EasyTravel
+                sovellusta paikantamaan parkkipaikkoja ja hänen matkansa sujuu ongelmitta. Mete ei käytä EasyTravel
+                sovellusta ja jää jumiin liikennevaloihin, eikä loppujen lopuksi löydä parkkipaikkaa,
+                joten hän ei pääse tuttujen luokse vierailemaan.</p>
+        </article>
         <article>
-            <h2>Projektin video</h2>
+            <h2>Mainosvideon selostus (alkuperäinen)</h2>
+            <audio controls>
+                <source src="" type="audio/mp3">
+                selaimesi ei tue äänitiedostoa
+            </audio><br>
+            <h2>Mainosvideon selostus (käsitelty - kohina poistettu)</h2>
+            <audio controls>
+                <source src="" type="audio/mp3">
+                selaimesi ei tue äänitiedostoa
+            </audio>
+        </article>
+        <article id="piirros">
+            <h2>Piirros videosta</h2>
             <figure>
-                <img src="kuvat/parkkipaikka.jpg" width="500px" alt="parkkipaikka">
+                <img src="kuvat/piirros.jpg" alt="piirros">
+                <figcaption>Piirros</figcaption>
             </figure>
         </article>
+        <div id="modaldiv"></div>
     </main>
+<script src="js/slideshow.js"></script>
 </body>
 </html>

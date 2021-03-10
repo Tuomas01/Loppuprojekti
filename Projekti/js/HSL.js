@@ -1,8 +1,3 @@
-function naytatiedot(element) {
-  const divi = document.getElementById(element);
-  divi.classList.toggle('show');
-}
-
 // Hae lat ja long arvot HSL apista
 async function getRoutePoints(start, end) {
   const queryFrom = await fetch(`https://api.digitransit.fi/geocoding/v1/search?text=${start}&size=1`);
@@ -10,6 +5,8 @@ async function getRoutePoints(start, end) {
 
   const from = await queryFrom.json();
   const to = await queryTo.json();
+
+  if (from.features.length === 0 || to.features.length === 0) return false;
 
   const coordinates = {
     from: {
@@ -20,7 +17,6 @@ async function getRoutePoints(start, end) {
       lat: to.features[0].geometry.coordinates[1],
       lon: to.features[0].geometry.coordinates[0],
     },
-
   };
   return coordinates;
 }
@@ -30,25 +26,52 @@ async function getRoute(start, end) {
   const url = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql';
   // GraphQL haku
   const route = await getRoutePoints(start, end);
+
+  if (!route) {
+    alert('No routes found');
+    return false;
+  }
   const query = `{
     plan(
       from: {lat: ${route.from.lat}, lon: ${route.from.lon}}
       to: {lat: ${route.to.lat}, lon: ${route.to.lon}}
     ) {
-      itineraries {
+      itineraries{
+        walkDistance,
+        duration,
         legs {
+          mode
           startTime
           endTime
-          mode
-          duration
+          from {
+            lat
+            lon
+            name
+            stop {
+              code
+              name
+            }
+          },
+          to {
+            lat
+            lon
+            name
+          },
+          trip {
+            route {
+              shortName
+            }
+          }
           distance
           legGeometry {
+            length
             points
           }
         }
       }
     }
   }`;
+  map.flyTo(route.from, 12);
 
   const fetchOptions = {
     method: 'POST',
@@ -61,25 +84,175 @@ async function getRoute(start, end) {
   const response = await fetch(url, fetchOptions);
   const result = await response.json();
 
+  if (result.data.plan.itineraries.length === 0) {
+    const reitit = document.getElementById('ajat');
+    if (reitit) {
+      document.getElementById('ajat').innerHTML = '<p>Ei mahdollisia reittejä (HSL-alue)</p>';
+      return false;
+    }
+    const message = document.createElement('p');
+    message.innerHTML = '<p>Ei mahdollisia reittejä (HSL-alue)</p>';
+    message.id = 'ajat';
+    if (window.innerWidth <= 1024) {
+      alert('Ei mahdollisia reittejä (HSL-alue)');
+    } else if (window.innerWidth > 1024) {
+      document.getElementById('aside').appendChild(message);
+    }
+    return false;
+  }
+
   // hae id, johon tiedot lisätään
-  const lahto = document.getElementById('startTime');
-  lahto.innerHTML = '';
-  console.log(result);
-  // Looppi, joka käy läpi itinararies taulukkoa
+  const lahto = document.createElement('p');
+  lahto.id = 'startTime';
+  const ajat = document.createElement('div');
+  ajat.id = 'ajat';
+  const aside = document.getElementById('aside');
+  aside.removeChild(aside.lastChild);
+  document.getElementById('aside').appendChild(ajat);
+
+  const valikko = document.createElement('div');
+  valikko.id = 'swipe';
+  document.body.removeChild(document.body.lastChild);
+
+  const arrowContainer = document.createElement('div');
+  arrowContainer.id = 'arrowContainer';
+  const arrowUp = document.createElement('span');
+  arrowUp.id = 'arrowUp';
+  arrowUp.innerHTML = '&#65085;';
+
+  function showOnClick() {
+    if (arrowContainer.classList.contains('rotate')) {
+      arrowContainer.classList.toggle('rotate');
+      valikko.style.animation = 'down 0.5s forwards';
+      arrowContainer.style.position = 'static';
+      valikko.style.overflow = 'hidden';
+      arrowContainer.style.marginTop = '-8px';
+      document.getElementById('startTime').style.display = 'none';
+    } else {
+      if (document.getElementById('startTime')) {
+        document.getElementById('startTime').style.display = 'block';
+      }
+      valikko.style.animation = 'up 0.5s forwards';
+      arrowContainer.classList.toggle('rotate');
+      valikko.style.overflow = 'auto';
+      arrowContainer.style.position = 'sticky';
+      arrowContainer.style.marginTop = '0';
+    }
+  }
+  showOnClick();
+  // Liikuta ruutua alaspäin jotta kartta näkyy jos ruutu on liian pieni
+  window.scrollBy({ top: 62 });
+
+  // Valikko lähdöille
+  arrowContainer.style.textAlign = 'center';
+  arrowUp.classList = 'arrow arrow-top glow';
+  arrowContainer.onclick = showOnClick;
+  arrowContainer.appendChild(arrowUp);
+  valikko.appendChild(arrowContainer);
+
+  // Näytä tarkemmat tiedot reitistä
+  function naytatiedot(element) {
+    const divi = document.getElementById(element);
+    divi.classList.toggle('show');
+    if (divi.classList.length > 1) return false;
+  }
+
+  function poistaReittiKartalta(id) {
+  // Poista valittu reitti kartalta
+    map.eachLayer((layer) => {
+      if (layer.options.id === id) layer.remove();
+    });
+  }
+
+  // Piirrä klikattu reitti kartalle
+  function reittiKartalle(reitti, id) {
+    // Määrittele värit reitillä
+    reitti.forEach((point) => {
+      let color = '';
+      let dashArray = '';
+      switch (point.mode) {
+        case 'WALK':
+          color = 'black';
+          dashArray = '5,10';
+          break;
+        case 'BUS':
+          color = '#007ac9';
+          break;
+        case 'RAIL':
+          color = '#8c4799';
+          break;
+        case 'TRAM':
+          color = '#00985f';
+          break;
+        case 'SUBWAY':
+          color = '#ff6319';
+          break;
+        default:
+          color = 'blue';
+          break;
+      }
+      const route = point.legGeometry.points;
+      const points = L.Polyline
+        .fromEncoded(route)
+        .getLatLngs();
+
+      L.polyline(points)
+        .setStyle({
+          color,
+          dashArray,
+          id,
+        })
+        .addTo(map);
+    });
+  }
+
+  // Looppi, joka käy läpi itineraries taulukkoa
   for (let i = 0; i < result.data.plan.itineraries.length; i++) {
+    const reitti = result.data.plan.itineraries[i].legs;
+    const kestoSekunteina = result.data.plan.itineraries[i].duration;
+    const kestoMinuutteina = Math.round(kestoSekunteina / 60);
+
     // Luodaan nappulat sivulle, joista voi togglettaa matkojen tietoja
-    const nappula = `</br> 
-                    <button id="button${i}" onclick="naytatiedot('lahto${i}')">Lähtö ${i + 1}</button><article id="lahto${i}" class="hide">`;
-    lahto.innerHTML += nappula;
+    const nappula = document.createElement('button');
+    nappula.className = 'lahdot';
+    nappula.id = `button${i}`;
+    nappula.innerText = `Lähtö ${i + 1} (${kestoMinuutteina} min)`;
+
+    // Napin onclick funktio
+    nappula.addEventListener('click', () => {
+      const id = `lahto${i}`;
+      const element = document.getElementById(id);
+      naytatiedot(id);
+      if (element.classList.length > 1) reittiKartalle(reitti, `line${i}`);
+      else {
+        poistaReittiKartalta(`line${i}`);
+      }
+    });
+
+    // Luodaan div johon liitetään tietoja reitistä
+    const div = document.createElement('div');
+    div.id = `lahto${i}`;
+    div.className = 'hide';
+
+    lahto.appendChild(nappula);
+    lahto.appendChild(div);
+    document.body.appendChild(valikko);
+    if (window.innerWidth <= 1024) {
+      document.body.lastChild.remove();
+      document.body.appendChild(valikko);
+      valikko.appendChild(lahto);
+    } else if (window.innerWidth > 1000) {
+      document.getElementById('ajat').appendChild(lahto);
+    }
 
     // Looppi, joka käy läpi legs-taulukkoa, joka on itinararies taulukon sisällä (sisäkkäinen for looppi)
-    for (let j = 0; j < result.data.plan.itineraries[i].legs.length; j++) {
+    for (let j = 0; j < reitti.length; j++) {
       // luodaan unix muuttuja, joka tallentaa unix arvot, jotta voidaan myöhemmin muuntaa ne oikeeseen muotoon
-      const unixstart = result.data.plan.itineraries[i].legs[j].startTime;
-      const unixend = result.data.plan.itineraries[i].legs[j].endTime;
+      const unixstart = reitti[j].startTime;
+      const unixend = reitti[j].endTime;
       // luodaan muuttuja mode, johon annetaan arvoksi tapa, jolla matkustetaan
-      let { mode } = result.data.plan.itineraries[i].legs[j];
-      const distance = Math.round(result.data.plan.itineraries[i].legs[j].distance);
+      let { mode } = reitti[j];
+      const distance = Math.round(reitti[j].distance);
       // Luo Date objekti ja anna sen arvoksi unix, jotta unix arvo muutetaan date muotoon, eli tallenna unix arvot muuttujiin
       const lahtoaika = new Date(unixstart);
       const loppuaika = new Date(unixend);
@@ -92,50 +265,80 @@ async function getRoute(start, end) {
       const loppuminuutit = `0${loppuaika.getMinutes()}`;
       // lisätään päivämäärä ja lähtemisaika muuttujaan
       // miinustetaan minuuteista ensimmäiset 2 numeroa, jotta minuutit näkyvät oikeassa muodossa
-      const aikaamatkaan = (lopputunnit + loppuminuutit.substr(-2)) - (lahtotunnit + lahtominuutit.substr(-2));
       const lahtemisaika = `${lahtotunnit}.${lahtominuutit.substr(-2)}`;
       const pysahdysaika = `${lopputunnit}.${loppuminuutit.substr(-2)}`;
+      const kilometrit = (distance / 1000).toFixed(1);
+      let loppu = reitti[j].to.name;
+      let alku = reitti[j].from.name;
+
+      const info = document.createElement('div');
+      info.className = 'info';
+
+      const img = document.createElement('img');
+      img.className = 'transport';
+
+      const linjaNro = document.createElement('p');
+      linjaNro.className = 'linja';
+
+      if (reitti[j].trip) {
+        linjaNro.innerHTML = `(${reitti[j].trip.route.shortName})`;
+      }
+
+      if (alku === 'Origin') {
+        alku = document.getElementById('from').value.split(' ')[0];
+        alku = alku.charAt(0).toUpperCase() + alku.slice(1);
+      }
+
+      if (loppu === 'Destination') {
+        loppu = document.getElementById('to').value.split(' ')[0];
+        loppu = loppu.charAt(0).toUpperCase() + loppu.slice(1);
+      }
 
       // Muuta mode muuttujaan, millä tavalla matkustetaan ja lisää aika, joka kuluu matkaan
       if (mode === 'WALK') {
-        mode = ` Kävele ${distance} m (${aikaamatkaan} min)`;
+        mode = `${alku} \u2192 ${loppu} ${kilometrit} km`;
+        img.src = 'img/walking.svg';
+        img.alt = 'walk';
       } else if (mode === 'RAIL') {
-        mode = ` Matkusta junalla ${distance} m (${aikaamatkaan} min)`;
+        mode = `Juna ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
+        img.src = 'img/train.svg';
+        img.alt = 'railway';
       } else if (mode === 'BUS') {
-        mode = ` Matkusta bussilla ${distance} m (${aikaamatkaan} min)`;
+        mode = `Bussi ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
+        img.src = 'img/bus.svg';
+        img.alt = 'bus';
       } else if (mode === 'SUBWAY') {
-        mode = ` Matkusta metrolla ${distance} m (${aikaamatkaan} min)`;
+        mode = `Metro ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
+        img.src = 'img/subway.svg';
+        img.alt = 'subway';
+      } else if (mode === 'TRAM') {
+        mode = `Raitiovaunu ${linjaNro.textContent} ${loppu} ${kilometrit} km`;
+        img.src = 'img/tram.svg';
+        img.alt = 'tram';
+      } else {
+        mode = 'Ei tietoa saatavilla';
       }
 
       // Luo p tägi ja teksti p tägien sisään
       const tiedot = document.createElement('p');
-      const teksti = document.createTextNode(`Klo: ${lahtemisaika} - ${pysahdysaika} ${mode}`);
+      tiedot.classList = 'tiedot';
+      const teksti = document.createTextNode(`${mode}`);
+      const aika = document.createElement('p');
+      aika.innerText = `${lahtemisaika} - ${pysahdysaika}`;
+      aika.className = 'aika';
       tiedot.appendChild(teksti);
-      // lisää ptägit article tagin sisään
-      document.getElementById(`lahto${i}`).appendChild(tiedot);
-      // lisätään muuttuja uusi, joka sisältää lähtemis- ja pysähdysajat, kuljetusvälineen ja ajan sivulle
-      /* document.getElementById('button' + i).addEventListener('click', function() {
-        naytatiedot("lahto" + i);
-      }); */
+      info.appendChild(aika);
+      info.appendChild(tiedot);
+      info.appendChild(img);
+
+      // lisää ptägit div tagin sisään
+      document.getElementById(`lahto${i}`).appendChild(info);
     }
   }
-
   console.log(result);
 
-  // TODO:
-  // Oma layeri reitti polygonille
-
-  // Poista vanha reitti ennen uuden reitin lisäämistä kartalle
-  // Tämä on vasta ns. "purkkaratkaisu", mutta toimii
-  map.eachLayer((layer) => {
-    if (layer._path != null) {
-      if (!layer._latlngs[0].length) layer.remove();
-    }
-  });
-
-  // Määrittele värit reitillä
-  // Esim. kävelypätkä = vihreä
-  // Nämä ovat vain placeholdereita
+  // Näytä ensimmäinen reitti aina haun jälkeen kartalla
+  naytatiedot('lahto0');
   result.data.plan.itineraries[0].legs.forEach((point) => {
     let color = '';
     let dashArray = '';
@@ -151,7 +354,7 @@ async function getRoute(start, end) {
         color = '#8c4799';
         break;
       case 'TRAM':
-        color = 'magenta';
+        color = '#00985f';
         break;
       case 'SUBWAY':
         color = '#ff6319';
@@ -165,21 +368,59 @@ async function getRoute(start, end) {
       .fromEncoded(route)
       .getLatLngs();
 
-    if (points instanceof L.Polyline) console.log('hepp');
     // Lisää tyylit reitille ja piirrä se kartalle
-    L.polyline(points)
-      .setStyle({
-        color,
-        dashArray,
-      })
-      .addTo(map);
+    if (!(points instanceof L.Polyline)) {
+      L.polyline(points)
+        .setStyle({
+          color,
+          dashArray,
+          id: 'line0',
+        })
+        .addTo(map);
+    }
   });
 }
 
 // Hae kenttien arvot
 // Piirrä reitti kartalle
 function showRoute() {
+  map.eachLayer((layer) => {
+    if (layer._path != null) {
+      if (!layer._latlngs[0].length) layer.remove();
+    }
+  });
   const from = document.getElementById('from').value;
   const to = document.getElementById('to').value;
   getRoute(from, to);
 }
+
+// Jos näyttöleveyttä muutetaan
+window.addEventListener('resize', () => {
+  const data = document.getElementById('startTime');
+  const normaali = document.getElementById('ajat');
+  const swipe = document.getElementById('swipe');
+  const ready = (swipe && data);
+  if (window.innerWidth <= 1024 && ready) {
+    swipe.appendChild(data);
+  } else if (window.innerWidth > 1024 && ready) {
+    normaali.appendChild(data);
+    data.style.display = 'block';
+  }
+});
+
+// hae nappula ja fieldset jossa suodatusasetukset ovat
+const filternappi = document.getElementById('filterButton');
+const filtercontent = document.querySelector('fieldset');
+// lisää nappiin onclick eventti, jolla toggletaan show classiä, joka vaihtaa displayksi flex tai none
+filternappi.addEventListener('click', () => {
+  filtercontent.classList.toggle('show');
+});
+
+document.getElementById('vaihto').addEventListener('click', () => {
+  // Vaihda arvoja kun käyttäjä painaa edestakas nuolia
+  let a = document.getElementById('from').value;
+  let b = document.getElementById('to').value;
+  [a, b] = [b, a];
+  document.getElementById('from').value = a;
+  document.getElementById('to').value = b;
+});

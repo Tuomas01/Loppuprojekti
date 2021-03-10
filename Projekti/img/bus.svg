@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1"
+  style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality;"
+  viewBox="0 0 624 817.5" x="0px" y="0px" fill-rule="evenodd" clip-rule="evenodd" fill='#007ac9'>
+  <g>
+    <path class="fil0"
+      d="M170 597l0 25c0,43 -76,43 -76,0l0 -25c-25,-1 -44,-21 -44,-45l0 -473c86,-105 438,-105 524,0l0 473c0,24 -19,44 -43,45l0 25c0,43 -77,43 -77,0l0 -25 -284 0zm66 -523l0 28 152 0 0 -28 -152 0zm-138 67l0 266 428 0 0 -266 -428 0zm488 62l0 96c0,25 38,25 38,0l0 -96c0,-25 -38,-25 -38,0zm-97 258c-24,0 -44,20 -44,44 0,24 20,44 44,44 24,0 44,-20 44,-44 0,-24 -20,-44 -44,-44zm-450 -258l0 96c0,25 -39,25 -39,0l0 -96c0,-25 39,-25 39,0zm96 258c24,0 44,20 44,44 0,24 -20,44 -44,44 -24,0 -44,-20 -44,-44 0,-24 20,-44 44,-44z" />
+  </g>
+</svg>

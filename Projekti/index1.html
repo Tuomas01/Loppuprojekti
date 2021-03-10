@@ -3,94 +3,106 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="description" content="EasyTravel map services">
+  <meta name="keywords" content="HTML, CSS, JavaScript, HSL">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!--Add leaflet library from CDN-->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-    crossorigin="" />
+    crossorigin="" defer />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
     crossorigin=""></script>
-  <script
-    src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
-  <script src="vendor/code.min.js"></script>
-  <script src="vendor/Polyline.encoded.js"></script>
+  <script src="vendor/code.min.js" defer></script>
+  <script src="vendor/Polyline.encoded.js" defer></script>
   <!--Leaflet END-->
 
   <!--Cluster markers on map -->
   <link rel="stylesheet" href="vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css">
   <link rel="stylesheet" href="vendor/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css">
-  <script src="vendor/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
+  <script src="vendor/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js" defer></script>
   <!--Cluster END -->
   <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/header.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/slider.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
-
-  <title>Kartta</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+  <title>EasyTravel</title>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <h1>EasyTravel etusivu</h1>
-      <a href="videosivu.html">Videosivu</a>
-      <a href="index1.html">Etusivu</a>
-    </nav>
-  </header>
   <main>
     <aside id="aside">
-      <section>
-        <form onsubmit="showRoute(); return false" id='fields'>
-          <input type='text' id='from' placeholder="Syötä lähtöpaikka" list='optionsFrom' autocomplete="off" required>
-          <datalist id="optionsFrom">
-          </datalist>
-          <input type='text' id='to' placeholder="Syötä määränpää" list='optionsTo' autocomplete="off" required>
-          <datalist id="optionsTo">
-          </datalist>
-          <button type="submit" id='hsl'>Näytä reitti</button>
-        </form>
-        <!-- <button id='findBtn' onclick="findMe()">Find me</button> -->
-      </section>
-      <section id='filter'>
-        <div class="option">
-          <label>Sähköauton latauspiste</label>
-          <input id='sahkoAuto' type='checkbox' class="filtered">
-        </div>
-        <div class="option">
-          <label>Ilmainen</label>
-          <input id='ilmainen' type='checkbox' class="filtered">
-        </div>
-        <div class="option">
-          <label>Vyöhykkeet</label>
-          <button id='zoneA' class="zones filtered selected">A</button>
-          <button id='zoneB' class="zones filtered selected">B</button>
-          <button id='zoneC' class="zones filtered selected">C</button>
-          <button id='zoneD' class="zones filtered selected">D</button>
-          <button id='muut' class="zones filtered selected">Muut</button>
-        </div>
-      </section>
-      <div id="ajat">
-        <p>Ajat:</p>
-        <p id="startTime"></p>
+      <header class="header">
+        <a href="index1.html" class="logo">EasyTravel</a>
+        <input class="menu-btn" type="checkbox" id="menu-btn" />
+        <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+        <ul class="menu">
+          <li><a href="videosivu.html">Videosivu</a></li>
+          <li><a href="index1.html">Info</a></li>
+        </ul>
+      </header>
+      <form onsubmit="showRoute(); return false" id='fields'>
+        <input title="Lähtöpaikka" type='text' id='from' placeholder="Syötä lähtöpaikka" list='optionsFrom'
+          autocomplete="off" required>
+        <svg id='vaihto' xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 0 24 30" version="1.1" x="0px" y="0px">
+          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+            <g fill-rule="nonzero" fill="#000000">
+              <path
+                d="M6,8.41421356 L3.70710678,10.7071068 C3.31658249,11.0976311 2.68341751,11.0976311 2.29289322,10.7071068 C1.90236893,10.3165825 1.90236893,9.68341751 2.29289322,9.29289322 L6.29289322,5.29289322 C6.68341751,4.90236893 7.31658249,4.90236893 7.70710678,5.29289322 L11.7071068,9.29289322 C12.0976311,9.68341751 12.0976311,10.3165825 11.7071068,10.7071068 C11.3165825,11.0976311 10.6834175,11.0976311 10.2928932,10.7071068 L8,8.41421356 L8,17.0769231 C8,17.5867244 7.55228475,18 7,18 C6.44771525,18 6,17.5867244 6,17.0769231 L6,8.41421356 Z M16,15.5857864 L16,6.92307692 C16,6.41327562 16.4477153,6 17,6 C17.5522847,6 18,6.41327562 18,6.92307692 L18,15.5857864 L20.2928932,13.2928932 C20.6834175,12.9023689 21.3165825,12.9023689 21.7071068,13.2928932 C22.0976311,13.6834175 22.0976311,14.3165825 21.7071068,14.7071068 L17.7071068,18.7071068 C17.3165825,19.0976311 16.6834175,19.0976311 16.2928932,18.7071068 L12.2928932,14.7071068 C11.9023689,14.3165825 11.9023689,13.6834175 12.2928932,13.2928932 C12.6834175,12.9023689 13.3165825,12.9023689 13.7071068,13.2928932 L16,15.5857864 Z" />
+            </g>
+          </g>
+        </svg>
+        <datalist id="optionsFrom">
+        </datalist>
+        <input title="Määränpää" type='text' id='to' placeholder="Syötä määränpää" list='optionsTo' autocomplete="off"
+          required>
+        <datalist id="optionsTo">
+        </datalist>
+        <button type="submit" id='hsl'>Hae reitti</button>
+      </form>
+      <div id="filterdiv">
+        <img id='filterButton' src="img/filter.svg" alt='filter icon' width="40px" height="40px">
+        <fieldset class='filter'>
+          <div class="option">
+            <label>Sähköauton latauspiste</label>
+            <input id='sahkoAuto' type='checkbox' class="filtered slider">
+          </div>
+          <div class="option">
+            <label>Ilmainen</label>
+            <input id='ilmainen' type='checkbox' class="filtered slider">
+          </div>
+          <div class="option">
+            <label>Vyöhykkeet</label>
+            <button id='zoneA' class="zones filtered selected">A</button>
+            <button id='zoneB' class="zones filtered selected">B</button>
+            <button id='zoneC' class="zones filtered selected">C</button>
+            <button id='zoneD' class="zones filtered selected">D</button>
+            <button id='muut' class="zones filtered selected">Muut</button>
+          </div>
+        </fieldset>
       </div>
     </aside>
-    <section id='map'></section>
+    <map name='map' id='map'></map>
   </main>
-  <script src="./js/icons.js"></script>
-  <script src="./js/addZoneProp.js"></script>
-  <script src="./js/checkIfInsideZone.js"></script>
-  <script src="./js/clearMarkers.js"></script>
-  <script src="./js/filterData.js"></script>
-  <script src="./js/autofillAddress.js"></script>
+  <script src="./js/icons.js" defer></script>
+  <script src="./js/addZoneProp.js" defer></script>
+  <script src="./js/checkIfInsideZone.js" defer></script>
+  <script src="./js/clearMarkers.js" defer></script>
+  <script src="./js/filterData.js" defer></script>
+  <script src="./js/autofillAddress.js" defer></script>
   <script src="./js/getData.js"></script>
-  <script src="./js/getCoords.js"></script>
+  <script src="./js/getCoords.js" defer></script>
   <script src="./js/regionData.js"></script>
-  <script src="./js/map.js"></script>
-  <script src="./js/HSL.js"></script>
-  <script src="./js/zoneListeners.js"></script>
-  <script src="./js/main.js"></script>
+  <script src="./js/map.js" defer></script>
+  <script src="./js/HSL.js" defer></script>
+  <script src="./js/zoneListeners.js" defer></script>
+  <script src="./js/main.js" defer></script>
 </body>
 
 </html>
